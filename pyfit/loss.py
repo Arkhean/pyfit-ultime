@@ -3,14 +3,14 @@ import numpy as np
 import math
 # MSE
 
-def MSE(y_truth,y_pred):
+def mean_squared_error(y_truth,y_pred):
     n=len(y_pred)
     mse= n* (np.mean(np.array([y_truth,y_pred])))**2
     return mse
 
 # MAE
 
-def MAE(y_truth,y_pred):
+def mean_absolute_error(y_truth,y_pred):
     return(np.mean(np.array([y_truth,y_pred])))
 
 
