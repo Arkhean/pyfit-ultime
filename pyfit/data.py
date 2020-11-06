@@ -1,5 +1,5 @@
 """
-fonctions de data processing
+data processing functions
 """
 
 import numpy as np
@@ -22,10 +22,22 @@ def train_test_split(*arrays, **options):
         res += (train_set, test_set)
     return res
 
-def one_hot_encode():
+def one_hot_encode(x):
     """
     transform categorical data to vector with one one and zeros
     """
+    categories = dict()
+    index = 0
+    for element in x:
+        if x not in categories:
+            categories[x] = index
+            index += 1
+    n = len(categorie)
+    res = np.zeros((len(x), n))
+    for i in range(len(x)):
+        res[i, categories[x]] = 1
+    return res
+
 
 class Scaler:
     def __init__(self):
