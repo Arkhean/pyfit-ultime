@@ -2,13 +2,17 @@
 module containing metrics for model evaluation
 """
 
+#rappel pour moi:
+# TP: pred=True, true=True
+# FP: pred = True, true= False
+# FN: pred = False, true = True
+# TN: pred= False, true = False
 import numpy as np
 
 def accuracy_score(y_true, y_pred):
     """
     Accuracy classification score.
     """
-    #Compte du nombre exacte de prédiction:
     exact=0
     total=len(y_true)
     for i,y_true_i in enumerate(y_true):
@@ -25,13 +29,16 @@ def precision_score(y_true, y_pred):
     """
     TP=0
     FP=0
-    for i,y_true_i in enumerate(y_true):
-        if y_true_i:
-            if y_true_i==y_pred[i]:
+    for i,y_pred_i in enumerate(y_pred):
+        if y_pred_i:
+            if y_pred_i==y_true[i]:
                 TP+=1
             else:
                 FP+=1
-    return(TP/(TP+FP))
+    if TP==0:
+        return 0
+    else:
+        return(TP/(TP+FP))
 
 
 def recall_score(y_true, y_pred):
@@ -42,11 +49,14 @@ def recall_score(y_true, y_pred):
     """
     TP=0
     FN=0
-    for i,y_pred_i in enumerate(y_pred):
-        if y_pred_i:
-            if y_pred_i==y_true[i]:
+    for i,y_true_i in enumerate(y_true):
+        if y_true_i:
+            if y_true_i==y_pred[i]:
                 TP+=1
             else:
                 FN+=1
-    return(TP/(TP+FN))
+    if TP==0:
+        return 0
+    else:
+        return(TP/(TP+FN))
 
