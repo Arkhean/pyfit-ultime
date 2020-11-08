@@ -29,22 +29,29 @@ def one_hot_encode(x):
     categories = dict()
     index = 0
     for element in x:
-        if x not in categories:
+        if element not in categories:
             categories[x] = index
             index += 1
-    n = len(categorie)
-    res = np.zeros((len(x), n))
+    cat_count = len(categories)
+    res = np.zeros((len(x), cat_count))
     for i in range(len(x)):
         res[i, categories[x]] = 1
     return res
 
 
 class Scaler:
+    """
+    Standardize features by removing the mean and scaling to unit variance
+    """
     def __init__(self):
         pass
 
     def fit(self):
-        pass
+        """
+        Compute the mean and std to be used for later scaling.
+        """
 
     def transform(self):
-        pass
+        """
+        Perform standardization by centering and scaling
+        """
