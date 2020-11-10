@@ -2,10 +2,12 @@
 Fonctions d'activation utiles aux réseaux de neurones
 """
 
+from typing import Union
 import numpy as np
 
+T = Union[float, np.ndarray]
 
-def sigmoid(x, deriv=False):
+def sigmoid(x: T, deriv: bool = False) -> T:
     """
     sigmoid function 1 / (1+exp(-x))
     """
@@ -13,7 +15,7 @@ def sigmoid(x, deriv=False):
         return np.exp(-x) / ((1+np.exp(-x)) ** 2)
     return 1 / (1 + np.exp(-x))
 
-def relu(x, deriv=False):
+def relu(x: T, deriv: bool = False) -> T:
     """
     relu function max(x, 0)
     """
@@ -21,7 +23,7 @@ def relu(x, deriv=False):
         return 1 if x > 0 else 0
     return x if x > 0 else 0
 
-def tanh(x, deriv=False):
+def tanh(x: T, deriv: bool = False) -> T:
     """
     tanh function sinh(x) / cosh(x)
     """

@@ -9,7 +9,7 @@ module containing metrics for model evaluation
 # TN: pred= False, true = False
 import numpy as np
 
-def accuracy_score(y_true, y_pred):
+def accuracy_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     """
     Accuracy classification score.
     """
@@ -20,7 +20,7 @@ def accuracy_score(y_true, y_pred):
             exact+=1
     return(exact/total)
 
-def precision_score(y_true, y_pred):
+def precision_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     """
     The precision is the ratio tp / (tp + fp) where tp is the number of true
     positives and fp the number of false positives. The precision is intuitively
@@ -41,7 +41,7 @@ def precision_score(y_true, y_pred):
         return(TP/(TP+FP))
 
 
-def recall_score(y_true, y_pred):
+def recall_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     """
     The recall is the ratio tp / (tp + fn) where tp is the number of true
     positives and fn the number of false negatives. The recall is intuitively
@@ -59,4 +59,3 @@ def recall_score(y_true, y_pred):
         return 0
     else:
         return(TP/(TP+FN))
-

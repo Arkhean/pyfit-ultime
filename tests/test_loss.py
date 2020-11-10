@@ -10,10 +10,6 @@ def test_mean_squarred_error():
     y_pred = [2.5, 0.0, 2, 8]
     assert mean_squared_error(y_true, y_pred) == 0.375
 
-    y_true = [3, -0.5, 2, 7]
-    y_pred = [2.5, 0.0, 2, 8]
-    assert mean_squared_error(y_true, y_pred, squared=False) >= 0.612
-
     y_true = [[0.5, 1], [-1, 1], [7, -6]]
     y_pred = [[0, 2], [-1, 2], [8, -5]]
     assert mean_squared_error(y_true, y_pred) >= 0.708
