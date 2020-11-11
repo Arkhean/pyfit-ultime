@@ -24,6 +24,6 @@ def log_loss(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     n = len(y_pred)
     sum = 0
     for i, y_i in enumerate(y_true):
-        sum += y_i*math.log(y_pred[i]) + (i-y_i)*math.log(1-y_pred[i])
+        sum += y_i*math.log(y_pred[i]) + (1-y_i)*math.log(1-y_pred[i])
     logl = (-1 / n) * sum
     return logl
