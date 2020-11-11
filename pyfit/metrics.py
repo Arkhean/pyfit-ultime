@@ -13,12 +13,12 @@ def accuracy_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     """
     Accuracy classification score.
     """
-    exact=0
-    total=len(y_true)
-    for i,y_true_i in enumerate(y_true):
-        if y_true_i==y_pred[i]:
-            exact+=1
-    return(exact/total)
+    exact = 0
+    total = len(y_true)
+    for i, y_true_i in enumerate(y_true):
+        if y_true_i == y_pred[i]:
+            exact += 1
+    return(exact / total)
 
 def precision_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     """
@@ -27,18 +27,18 @@ def precision_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
      the ability of the classifier not to label as positive a sample that is
      negative.
     """
-    TP=0
-    FP=0
-    for i,y_pred_i in enumerate(y_pred):
+    true_pos = 0
+    false_pos = 0
+    for i, y_pred_i in enumerate(y_pred):
         if y_pred_i:
-            if y_pred_i==y_true[i]:
-                TP+=1
+            if y_pred_i == y_true[i]:
+                true_pos += 1
             else:
-                FP+=1
-    if TP==0:
+                false_pos += 1
+    if true_pos == 0:
         return 0
     else:
-        return(TP/(TP+FP))
+        return(true_pos / (true_pos + false_pos))
 
 
 def recall_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
@@ -47,15 +47,15 @@ def recall_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     positives and fn the number of false negatives. The recall is intuitively
     the ability of the classifier to find all the positive samples.
     """
-    TP=0
-    FN=0
-    for i,y_true_i in enumerate(y_true):
+    true_pos = 0
+    false_neg = 0
+    for i, y_true_i in enumerate(y_true):
         if y_true_i:
-            if y_true_i==y_pred[i]:
-                TP+=1
+            if y_true_i == y_pred[i]:
+                true_pos += 1
             else:
-                FN+=1
-    if TP==0:
+                false_neg += 1
+    if true_pos == 0:
         return 0
     else:
-        return(TP/(TP+FN))
+        return(true_pos / (true_pos + false_neg))
