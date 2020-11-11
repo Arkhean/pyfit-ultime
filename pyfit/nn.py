@@ -61,28 +61,28 @@ class NeuronLayer(Layer):
         """
         return self.activation_function(x.dot(self._weights) + self._bias)
 
-class DropoutLayer(Layer):
-    """
-    layer where some neurons are put to zero
-    """
-    def __init__(self, probability: float):
-        Layer.__init__(self, None, None, None)
-        self.probability = probability
-
-    def back(self, x: np.ndarray, delta: np.ndarray, alpha: float) -> np.ndarray:
-        """
-        do nothing
-        """
-        return delta
-
-    def predict(self, x: np.ndarray) -> np.ndarray:
-        """
-        put some neurons to zero
-        """
-        for i in range(len(x)):
-            if np.random.random_sample() < self.probability:
-                x[i] = 0
-        return x
+# class DropoutLayer(Layer):
+#     """
+#     layer where some neurons are put to zero
+#     """
+#     def __init__(self, probability: float):
+#         Layer.__init__(self, None, None, None)
+#         self.probability = probability
+#
+#     def back(self, x: np.ndarray, delta: np.ndarray, alpha: float) -> np.ndarray:
+#         """
+#         do nothing
+#         """
+#         return delta
+#
+#     def predict(self, x: np.ndarray) -> np.ndarray:
+#         """
+#         put some neurons to zero
+#         """
+#         for i in range(len(x)):
+#             if np.random.random_sample() < self.probability:
+#                 x[i] = 0
+#         return x
 
 ################################################################################
 
