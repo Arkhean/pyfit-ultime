@@ -18,7 +18,7 @@ def accuracy_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     for i, y_true_i in enumerate(y_true):
         if y_true_i == y_pred[i]:
             exact += 1
-    return(exact / total)
+    return exact / total
 
 def precision_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     """
@@ -37,8 +37,7 @@ def precision_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
                 false_pos += 1
     if true_pos == 0:
         return 0
-    else:
-        return(true_pos / (true_pos + false_pos))
+    return true_pos / (true_pos + false_pos)
 
 
 def recall_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
@@ -57,5 +56,4 @@ def recall_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
                 false_neg += 1
     if true_pos == 0:
         return 0
-    else:
-        return(true_pos / (true_pos + false_neg))
+    return true_pos / (true_pos + false_neg)

@@ -1,9 +1,10 @@
 """
 Kmeans clustering algorithm
 """
-from typing import List
+from typing import List, TypeVar
 import numpy as np
 
+T = TypeVar('T', bound='KMeans')
 
 class KMeans:
     """
@@ -18,7 +19,7 @@ class KMeans:
         self.centers_: List[np.ndarray] = list() # TODO mieux ?
         self.labels_: List[int] = list()
 
-    def fit(self, dataset: np.ndarray, max_iter: int = 50) -> KMeans:
+    def fit(self, dataset: np.ndarray, max_iter: int = 100) -> T:
         """
         Compute k-means clustering.
         """
@@ -37,8 +38,8 @@ class KMeans:
             # The label is the one of the closest centroid
             for i, p in enumerate(dataset):
                 dist_vec = np.zeros((len(centroids), 1))
-                for j, c in enumerate(centroids):
-                    dist_vec[j] = np.linalg.norm(p-c)
+                for j, center in enumerate(centroids):
+                    dist_vec[j] = np.linalg.norm(p-center)
                 labels[i] = np.argmin(dist_vec) #indice de la valeur minimum
 
             # Each centroid is the geometric mean
@@ -59,3 +60,12 @@ class KMeans:
         """
         Predict the closest cluster each sample in X belongs to.
         """
+        # TODO test dimensions
+        ret = list()
+        for sample in x:
+            best_center = self.centers_[0]
+            for center in self.centers_:
+                if np.linalg.norm(sample-center) < np.linalg.norm(sample-best_center):
+                    best_center = center
+            ret.append(best_center)
+        return np.array(ret)

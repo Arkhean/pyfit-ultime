@@ -1,29 +1,35 @@
-import numpy as np
+"""
+loss functions
+"""
+
 import math
-# MSE
+import numpy as np
+
+from _engine import as_array
 
 def mean_squared_error(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-    if type(y_true) is not np.ndarray:
-        y_true = np.array(y_true)
-    if type(y_pred) is not np.ndarray:
-        y_pred = np.array(y_pred)
+    """Mean squared error regression loss"""
+    y_true = as_array(y_true)
+    y_pred = as_array(y_pred)
     return np.mean((y_true - y_pred) ** 2)
 
-# MAE
+
 
 def mean_absolute_error(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-    if type(y_true) is not np.ndarray:
-        y_true = np.array(y_true)
-    if type(y_pred) is not np.ndarray:
-        y_pred = np.array(y_pred)
+    """Mean absolute error regression loss"""
+    y_true = as_array(y_true)
+    y_pred = as_array(y_pred)
     return np.mean(np.abs(y_true - y_pred))
 
 
-# log loss
+
 def log_loss(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    """Log loss, aka logistic loss or cross-entropy loss."""
+    y_true = as_array(y_true)
+    y_pred = as_array(y_pred)
     n = len(y_pred)
-    sum = 0
+    s_ = 0
     for i, y_i in enumerate(y_true):
-        sum += y_i*math.log(y_pred[i]) + (1-y_i)*math.log(1-y_pred[i])
-    logl = (-1 / n) * sum
+        s_ += y_i*math.log(y_pred[i]) + (1-y_i)*math.log(1-y_pred[i])
+    logl = (-1 / n) * s_
     return logl
