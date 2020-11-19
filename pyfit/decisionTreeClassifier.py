@@ -6,7 +6,6 @@ inspiration: http://www.oranlooney.com/post/ml-from-scratch-part-4-decision-tree
 import numpy as np
 
 
-
 def best_split_point(X, y, column):
     # sorting y by the values of X makes it almost trivial to count classes for
     # above and below any given candidate split point.
@@ -23,7 +22,7 @@ def best_split_point(X, y, column):
     # right) of any given candidate split point.
     #
     # Because class_0_below is a cummulative sum the last value in the array is
-    # the total sum. That means we don't need to make another pass through the *
+    # the total sum. That means we don't need to make another pass through the
     # array just to get the total; we can just grab the last element.
     class_0_above = class_0_below[-1] - class_0_below
     class_1_above = class_1_below[-1] - class_1_below
@@ -52,7 +51,25 @@ def best_split_point(X, y, column):
 
     return best_split_gini, best_split_value, column
 
+def best_split_point2(X, y, column, n_class):
+    ordering = np.argsort(X[:,column])
+    classes = y[ordering]
+    class_below = [(classes == n).cumsum() for n in range(n_class)]
+    class_above = [c[-1] - c for c in class_below]
 
+    below_total = np.arange(1, len(y)+1)
+    above_total = np.arange(len(y)-1, -1, -1)
+
+    gini = np.prod(class_below, axis=0) / (below_total ** n_class) + \
+           np.prod(class_above, axis=0) / (above_total ** n_class)
+
+    gini[np.isnan(gini)] = 1
+    best_split_rank = np.argmin(gini)
+    best_split_gini = gini[best_split_rank]
+    best_split_index = np.argwhere(ordering == best_split_rank).item(0)
+    best_split_value = X[best_split_index, column]
+
+    return best_split_gini, best_split_value, column
 
 class DecisionTreeNode:
     """Node for decision tree"""
@@ -101,8 +118,9 @@ class DecisionTreeNode:
         """ expand node by creating 2 children minimizing impurity"""
         # if the node is not pure yet
         if self.impurity != 0:
+            print(f"impurity: {self.impurity}")
             # find decision axe and decision_value
-            splits = [ best_split_point(self.x, self.y, column) for column in range(self.x.shape[1]) ]
+            splits = [ best_split_point2(self.x, self.y, column, self.n_class) for column in range(self.x.shape[1]) ]
             splits.sort()
             gini, split_point, column = splits[0]
             self.decision_axe = column
