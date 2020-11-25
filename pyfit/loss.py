@@ -23,9 +23,9 @@ def log_loss(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     """Log loss, aka logistic loss or cross-entropy loss."""
     y_true = as_array(y_true)
     y_pred = as_array(y_pred)
-    n = len(y_pred)
-    s_ = 0
+    size = len(y_pred)
+    sum_ = 0
     for i, y_i in enumerate(y_true):
-        s_ += y_i*math.log(y_pred[i]) + (1-y_i)*math.log(1-y_pred[i])
-    logl = (-1 / n) * s_
+        sum_ += y_i * math.log(y_pred[i]) + (1 - y_i) * math.log(1 - y_pred[i])
+    logl = (-1 / size) * sum_
     return logl

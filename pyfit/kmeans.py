@@ -1,10 +1,9 @@
 """
 Kmeans clustering algorithm
 """
-from typing import List, TypeVar
+from typing import List
 import numpy as np
 
-T = TypeVar('T', bound='KMeans')
 
 class KMeans:
     """
@@ -16,10 +15,10 @@ class KMeans:
         create class ready to fit
         """
         self.n_clusters = n_clusters
-        self.centers_: List[np.ndarray] = list() # TODO mieux ?
+        self.centers_: List[np.ndarray] = list()
         self.labels_: List[int] = list()
 
-    def fit(self, dataset: np.ndarray, max_iter: int = 100) -> T:
+    def fit(self, dataset: np.ndarray, max_iter: int = 100) -> KMeans:
         """
         Compute k-means clustering.
         """
@@ -60,7 +59,9 @@ class KMeans:
         """
         Predict the closest cluster each sample in X belongs to.
         """
-        # TODO test dimensions
+        if x[0].shape != self.centers_[0].shape:
+            raise ValueError("vector of shape {x[0].shape} does not \
+                            match data space {self.centers_[0].shape}")
         ret = list()
         for sample in x:
             best_center = self.centers_[0]
