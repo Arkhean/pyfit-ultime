@@ -6,7 +6,7 @@ inspiration: http://www.oranlooney.com/post/ml-from-scratch-part-4-decision-tree
 from typing import Tuple, List, Optional
 import numpy as np
 
-def best_split_point(x: np.ndarray, y: np.ndarray, column: int, n_class: int) -> Tuple[float, float, int]:
+def best_split_point(x: np.ndarray, y: np.ndarray, column: int, n_class: int) -> Tuple[float, float]:
     """
     internal fonction, find best split value for column, minimizing gini impurity
     """
@@ -54,7 +54,7 @@ def best_split_point(x: np.ndarray, y: np.ndarray, column: int, n_class: int) ->
     best_split_index = np.argwhere(ordering == best_split_rank).item(0)
     best_split_value = x[best_split_index, column]
 
-    return best_split_gini, best_split_value, column
+    return best_split_gini, best_split_value
 
 class DecisionTreeNode:
     """Node for decision tree"""
@@ -104,15 +104,20 @@ class DecisionTreeNode:
         # if the node is not pure yet
         if self.impurity != 0:
             # find decision axe and decision_value
-            splits = [best_split_point(self.x, self.y, column, self.n_class)
-                                        for column in range(self.x.shape[1])]
-            splits.sort()
-            _, split_point, column = splits[0]
-            self.decision_axe = column
-            self.decision_value = split_point
+            best_gini = 2 # > 1
+            for column in range(self.x.shape[1]):
+                # there must be different values for this feature
+                if np.unique(self.x[:, column]).shape[0] > 1:
+                    gini, split_point = best_split_point(self.x, self.y, column, self.n_class)
+                    if gini < best_gini:
+                        self.decision_axe = column
+                        self.decision_value = split_point
+
             # index for spliting data
-            below = self.x[:, column] <= split_point
-            above = self.x[:, column] > split_point
+            below = self.x[:, self.decision_axe] <= self.decision_value
+            above = self.x[:, self.decision_axe] > self.decision_value
+            print(self.decision_value)
+            print(self.x[:, self.decision_axe])
             # create children
             self.left_node = DecisionTreeNode(self.x[below], self.y[below],
                                                     self.n_class, self.criterion)

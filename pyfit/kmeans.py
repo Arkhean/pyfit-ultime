@@ -1,7 +1,7 @@
 """
 Kmeans clustering algorithm
 """
-from typing import List
+from typing import List, Any
 import numpy as np
 
 
@@ -18,7 +18,7 @@ class KMeans:
         self.centers_: List[np.ndarray] = list()
         self.labels_: List[int] = list()
 
-    def fit(self, dataset: np.ndarray, max_iter: int = 100) -> KMeans:
+    def fit(self, dataset: np.ndarray, max_iter: int = 100) -> Any:
         """
         Compute k-means clustering.
         """
