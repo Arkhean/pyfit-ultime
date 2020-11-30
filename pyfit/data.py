@@ -38,6 +38,12 @@ def one_hot_encode(x: np.ndarray) -> np.ndarray:
         res[i, categories[x]] = 1
     return res
 
+def make_classification(n_samples: int, nb_class: int) -> np.ndarray:
+    """
+    generate clusters of points normally distributed
+    """
+    # On pose un centre par classe...
+    pass
 
 class Scaler:
     """

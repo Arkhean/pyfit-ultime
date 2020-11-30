@@ -10,3 +10,5 @@ def test_1D_lin_reg():
     for i,element in enumerate(y_pred):
         assert element[0] > x_entree[i][0] - 0.2
         assert element[0] < x_entree[i][0] + 0.2
+
+# Test reg linéaire en plus de dimensions.
