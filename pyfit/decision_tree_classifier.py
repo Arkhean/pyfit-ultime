@@ -2,7 +2,7 @@
 Decision Tree Classfier class
 inspiration: http://www.oranlooney.com/post/ml-from-scratch-part-4-decision-tree/
 """
-
+import warnings
 from typing import Tuple, List, Optional
 import numpy as np
 
@@ -40,7 +40,10 @@ def best_split_point(x: np.ndarray, y: np.ndarray, column: int, n_class: int) ->
     for i in range(n_class):
         tmp = np.sum(class_above[:i], axis=0) + np.sum(class_above[i+1:], axis=0)
         above_gini += class_above[i] *tmp
-    above_gini /= (above_total ** 2)
+
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        above_gini /= (above_total ** 2)
 
     # last is divided by 0 so NaN
     above_gini[-1] = 1
@@ -109,15 +112,15 @@ class DecisionTreeNode:
                 # there must be different values for this feature
                 if np.unique(self.x[:, column]).shape[0] > 1:
                     gini, split_point = best_split_point(self.x, self.y, column, self.n_class)
-                    if gini < best_gini:
-                        self.decision_axe = column
-                        self.decision_value = split_point
+                    if split_point != np.max(self.x[:, column]):
+                        # the value cant be the max or there is no split made
+                        if gini < best_gini:
+                            self.decision_axe = column
+                            self.decision_value = split_point
 
             # index for spliting data
             below = self.x[:, self.decision_axe] <= self.decision_value
             above = self.x[:, self.decision_axe] > self.decision_value
-            print(self.decision_value)
-            print(self.x[:, self.decision_axe])
             # create children
             self.left_node = DecisionTreeNode(self.x[below], self.y[below],
                                                     self.n_class, self.criterion)
@@ -125,9 +128,10 @@ class DecisionTreeNode:
                                                     self.n_class, self.criterion)
             self.is_leaf = False
             # expand(max_depth-1)
-            if max_depth is not None and max_depth != 0:
-                self.left_node.expand(max_depth-1)
-                self.right_node.expand(max_depth-1)
+            if max_depth is not None:
+                if max_depth != 0:
+                    self.left_node.expand(max_depth-1)
+                    self.right_node.expand(max_depth-1)
             else:
                 self.left_node.expand(None)
                 self.right_node.expand(None)
@@ -136,9 +140,9 @@ class DecisionTreeNode:
         """
         predict class for x
         """
+        if self.is_leaf:
+            return np.argmax(self.value)
         if self.left_node is not None and self.right_node is not None:
-            if self.is_leaf:
-                return np.argmax(self.value)
             if x[self.decision_axe] <= self.decision_value:
                 return self.left_node.predict(x)
             return self.right_node.predict(x)
