@@ -38,12 +38,43 @@ def one_hot_encode(x: np.ndarray) -> np.ndarray:
         res[i, categories[x]] = 1
     return res
 
-def make_classification(n_samples: int, nb_class: int) -> np.ndarray:
+def make_classification(n_samples: int, nb_class: int, nb_features):
     """
     generate clusters of points normally distributed
     """
-    # On pose un centre par classe...
-    pass
+    # https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_classification.html
+    # https://github.com/scikit-learn/scikit-learn/blob/a24c8b46/sklearn/datasets/samples_generator.py#L37
+    # Initialisation x et y
+    x_points = np.zeros((n_samples, n_features))
+    y_points = np.zeros((n_samples, d_type=np.int))
+    # x_points = []
+    # y_points = []
+    # Chaque classe est une répartission dans un hypercube de dim nb_sample --> On choisi taille 1x1x1x1...
+    # Un cluster par classe
+    lim_plan= [0,6] # on pose ça pour changer plus tard?
+    # size = lim_plan[1] - lim_plan[0]
+    nb_sample_class = n_samples/nb_class
+    centres_cluster=[]
+    for i in range(nb_class):
+        #On choisi un centre de cluster aléatoirement des centres?
+        centre =[]
+        for _ in range(nb_features):
+            centre.append(random.randint(lim_plan[0]*10,lim_plan[1]*10)/10)
+        centre.append()
+        lower_lim = numpy.arange(0,nb_sample_class)/nb_sample_class
+        upper_lim = numpy.arange(1,nb_sample_class+1)/nb_sample_class
+        points = numpy.random.uniform(low = lower_lim, high = upper_limits, size = [nb_features, nb_sample_class]).T
+        numpy.random.shuffle(points[:,1])
+        # On place les points dans l'espace approprié
+        for p,point in enumerat(points):
+            for j in range(nb_features):
+                x_points[p][j] = point[j] + centre[j]
+            y_points[p] = p
+    
+    return x_points,y_points
+    
+
+    
 
 class Scaler:
     """
@@ -61,3 +92,4 @@ class Scaler:
         """
         Perform standardization by centering and scaling
         """
+
