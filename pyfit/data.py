@@ -3,7 +3,10 @@ data processing functions
 """
 from typing import Any, List
 import numpy as np
-
+import random
+import matplotlib
+import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
 
 def train_test_split(*arrays: Any, **options: Any) -> List[Any]:
     """
@@ -38,42 +41,44 @@ def one_hot_encode(x: np.ndarray) -> np.ndarray:
         res[i, categories[x]] = 1
     return res
 
-def make_classification(n_samples: int, nb_class: int, nb_features):
+def make_classification(nb_samples: int, nb_class: int, nb_features):
     """
     generate clusters of points normally distributed
     """
     # https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_classification.html
     # https://github.com/scikit-learn/scikit-learn/blob/a24c8b46/sklearn/datasets/samples_generator.py#L37
     # Initialisation x et y
-    x_points = np.zeros((n_samples, n_features))
-    y_points = np.zeros((n_samples, d_type=np.int))
-    # x_points = []
-    # y_points = []
-    # Chaque classe est une répartission dans un hypercube de dim nb_sample --> On choisi taille 1x1x1x1...
-    # Un cluster par classe
+    x_points = np.zeros((nb_samples, nb_features))
+    y_points = np.zeros((nb_samples, 1))
     lim_plan= [0,6] # on pose ça pour changer plus tard?
-    # size = lim_plan[1] - lim_plan[0]
-    nb_sample_class = n_samples/nb_class
-    centres_cluster=[]
+    nb_sample_class = (int)(nb_samples/nb_class)
     for i in range(nb_class):
-        #On choisi un centre de cluster aléatoirement des centres?
-        centre =[]
-        for _ in range(nb_features):
-            centre.append(random.randint(lim_plan[0]*10,lim_plan[1]*10)/10)
-        centre.append()
-        lower_lim = numpy.arange(0,nb_sample_class)/nb_sample_class
-        upper_lim = numpy.arange(1,nb_sample_class+1)/nb_sample_class
-        points = numpy.random.uniform(low = lower_lim, high = upper_limits, size = [nb_features, nb_sample_class]).T
-        numpy.random.shuffle(points[:,1])
-        # On place les points dans l'espace approprié
-        for p,point in enumerat(points):
-            for j in range(nb_features):
-                x_points[p][j] = point[j] + centre[j]
-            y_points[p] = p
-    
+      print(i)
+      #On choisi un centre de cluster aléatoirement des centres?
+      centre =[]
+      for _ in range(nb_features):
+        centre.append(random.randint(lim_plan[0]*10,lim_plan[1]*10)/10)
+      lower_lim = np.arange(0,nb_sample_class)/nb_sample_class
+      upper_lim = np.arange(1,nb_sample_class+1)/nb_sample_class
+      points = np.random.uniform(low = lower_lim, high = upper_lim, size = [nb_features, nb_sample_class]).T
+      np.random.shuffle(points[:,1])
+      # On place les points dans l'espace approprié
+      for p,point in enumerate(points):
+          for j in range(nb_features):
+              x_points[i * nb_sample_class + p][j] = point[j] + centre[j]
+          y_points[i * nb_sample_class + p] = i
     return x_points,y_points
     
+def plot_data(x, y):
+    """Plot some 2D data"""
 
+    fig, ax = plt.subplots()
+    scatter = ax.scatter(x[:, 0], x[:, 1], c=y, s=40, cmap=plt.cm.RdYlBu)
+    legend1 = ax.legend(*scatter.legend_elements(),
+                    loc="lower right", title="Classes")
+    ax.add_artist(legend1)
+    plt.xlim((min(x[:, 0]) - 0.1, max(x[:, 0]) + 0.1))
+    plt.ylim((min(x[:, 1]) - 0.1, max(x[:, 1]) + 0.1))
     
 
 class Scaler:

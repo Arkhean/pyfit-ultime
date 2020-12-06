@@ -2,7 +2,7 @@
 logistic regression algorithm
 """
 import numpy as np
-from activation import sigmoid
+from pyfit.activation import sigmoid
 
 class LogisticReg:
 # Descente de gradient:
