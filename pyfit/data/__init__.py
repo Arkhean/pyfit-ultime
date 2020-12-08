@@ -29,8 +29,6 @@ def make_classification(nb_samples: int, nb_class: int, nb_features: int) -> Tup
     """
     generate clusters of points normally distributed
     """
-    # https://scikit-learn.org/stable/modules/generated/sklearn.datasets.make_classification.html
-    # https://github.com/scikit-learn/scikit-learn/blob/a24c8b46/sklearn/datasets/samples_generator.py#L37
     # Initialisation x et y
     x_points = np.zeros((nb_samples, nb_features))
     y_points = np.zeros((nb_samples, 1))
@@ -38,7 +36,7 @@ def make_classification(nb_samples: int, nb_class: int, nb_features: int) -> Tup
     nb_sample_class = (int)(nb_samples / nb_class)
     for i in range(nb_class):
         print(i)
-        #On choisi un centre de cluster aléatoirement des centres?
+        #On choisi un centre de cluster aléatoirement
         centre = list()
         for _ in range(nb_features):
             centre.append(random.randint(lim_plan[0] * 10, lim_plan[1] * 10) / 10)

@@ -37,7 +37,7 @@ class LogisticReg:
     def predict(self, x_entree: np.ndarray) -> np.ndarray:
         x_entree_1 = self.passage_x1(x_entree)
         y_pred_value = np.matmul(x_entree_1, self.theta)
-        y_pred = np.zeros(len(y_pred_value), 1)
+        y_pred = y_pred_value
         for i, element in enumerate(y_pred):
             if element >= 0.5:
                 y_pred[i][0] = 1
