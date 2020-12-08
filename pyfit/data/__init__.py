@@ -25,22 +25,6 @@ def train_test_split(*arrays: Any, **options: Any) -> List[Any]:
         res += [train_set, test_set]
     return res
 
-def one_hot_encode(x: np.ndarray) -> np.ndarray:
-    """
-    transform categorical data to vector with one one and zeros
-    """
-    categories = dict()
-    index = 0
-    for element in x:
-        if element not in categories:
-            categories[x] = index
-            index += 1
-    cat_count = len(categories)
-    res = np.zeros((len(x), cat_count))
-    for i in range(len(x)):
-        res[i, categories[x]] = 1
-    return res
-
 def make_classification(nb_samples: int, nb_class: int, nb_features: int) -> Tuple[np.ndarray, np.ndarray]:
     """
     generate clusters of points normally distributed
@@ -80,28 +64,3 @@ def plot_data(x, y):
     ax.add_artist(legend1)
     plt.xlim((min(x[:, 0]) - 0.1, max(x[:, 0]) + 0.1))
     plt.ylim((min(x[:, 1]) - 0.1, max(x[:, 1]) + 0.1))
-
-
-class Scaler:
-    """
-    Standardize features by removing the mean and scaling to unit variance
-    """
-    def __init__(self) -> None:
-        self.mean_ = None
-        self.std_ = None
-
-    def fit(self, x: np.ndarray) -> None:
-        """
-        Compute the mean and std to be used for later scaling.
-        """
-        self.mean_ = np.mean(x, axis=0)
-        self.std_ = np.std(x, axis=0)
-
-    def transform(self, x: np.ndarray) -> np.ndarray:
-        """
-        Perform standardization by centering and scaling
-        """
-        x = as_array(x)
-        if self.mean_ is not None and self.std_ is not None:
-            return (x - self.mean_) / self.std_
-        raise RuntimeError("method fit has not been called yet")
