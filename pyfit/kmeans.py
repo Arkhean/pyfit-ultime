@@ -3,6 +3,7 @@ Kmeans clustering algorithm
 """
 from typing import List, Any
 import numpy as np
+from pyfit.engine import as_array
 
 
 class KMeans:
@@ -22,6 +23,7 @@ class KMeans:
         """
         Compute k-means clustering.
         """
+        dataset = as_array(dataset)
         # Initialize centroids by choosing randomly k points from the dataset
         n_points, _ = dataset.shape
         centroids = dataset[np.random.randint(n_points, size=self.n_clusters), :]
@@ -49,7 +51,6 @@ class KMeans:
                     centroids[j, :] = np.mean(dataset[group], axis=0)
                 else:
                     centroids[j, :] = dataset[np.random.randint(len(dataset))]
-        print("nb iterations : "+str(iterations))
 
         self.centers_ = centroids
         self.labels_ = labels
@@ -59,6 +60,7 @@ class KMeans:
         """
         Predict the closest cluster each sample in X belongs to.
         """
+        x = as_array(x)
         if x[0].shape != self.centers_[0].shape:
             raise ValueError("vector of shape {x[0].shape} does not \
                             match data space {self.centers_[0].shape}")
