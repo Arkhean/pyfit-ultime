@@ -52,7 +52,7 @@ def make_classification(nb_samples: int, nb_class: int, nb_features: int) -> Tup
             y_points[i * nb_sample_class + p] = i
     return x_points, y_points
 
-def plot_data(x, y):
+def plot_data(x: np.ndarray, y: np.ndarray) -> None:
     """Plot some 2D data"""
 
     _, ax = plt.subplots()
