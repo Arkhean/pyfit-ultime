@@ -11,19 +11,23 @@ class LogisticReg:
                 x_train: np.ndarray,
                 y_train: np.ndarray,
                 learning_rate=0.01,
-                max_iter=20) -> None:
+                max_iter=100) -> None:
         x_train_t = np.transpose(x_train)
+        m = len(x_train[0])
         #add column
         x_train_1 = self.passage_x1(x_train)
-        self.theta = np.random.random((len(x_train[0])+1, 1))
+        self.theta = np.random.random((m+1, 1))
         nb_iter = 1
         inter = sigmoid(np.matmul(x_train_1, self.theta)) - y_train
-        grad_theta = 2 / len(x_train[0]) * np.matmul(x_train_t, inter)
-        while(nb_iter < max_iter and grad_theta[0] < 10):
+        grad_theta = (2 / m) * np.matmul(x_train_t, inter)
+        # pb: grad_theta.shape != self.theta.shape
+        # et les valeurs sont gigantesques!
+        while nb_iter < max_iter:
             inter = sigmoid(np.matmul(x_train_1, self.theta)) - y_train
-            grad_theta = 2 / len(x_train[0]) * np.matmul(x_train_t, inter)
+            grad_theta = (2 / m) * np.matmul(x_train_t, inter)
             self.theta = self.theta - learning_rate * grad_theta
             nb_iter += 1
+        print(nb_iter)
 
     def passage_x1(self, x_entree: np.ndarray) -> np.ndarray:
         x_1 = []

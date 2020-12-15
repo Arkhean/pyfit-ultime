@@ -35,7 +35,7 @@ def make_classification(nb_samples: int, nb_class: int, nb_features: int) -> Tup
     lim_plan = [0, 6] # on pose ça pour changer plus tard?
     nb_sample_class = (int)(nb_samples / nb_class)
     for i in range(nb_class):
-        print(i)
+        #print(i)
         #On choisi un centre de cluster aléatoirement
         centre = list()
         for _ in range(nb_features):

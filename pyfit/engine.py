@@ -18,27 +18,26 @@ def as_array(x: Any) -> np.ndarray:
 
 ################################################################################
 
-# TODO: vector with numpy
 
-class Scalar:
-    """Stores a single scalar value and its gradient"""
+class Tensor:
+    """Stores values and their gradients"""
 
     def __init__(
-        self, data: float, children: Tuple["Scalar", ...] = (), op: str = ""
+        self, data: np.ndarray, children: Tuple["Tensor", ...] = (), op: str = ""
     ) -> None:
-        self.data: float = data
-        self.grad: float = 0
+        self.data: np.ndarray = as_array(data)
+        self.grad: np.ndarray = np.zeros(self.data.shape)
 
         # Internal variables used for autograd graph construction
         self._backward: Callable = lambda: None
-        self._prev: Set[Scalar] = set(children)
+        self._prev: Set[Tensor] = set(children)
         self._op = (
             op  # The operation that produced this node, for graphviz / debugging / etc
         )
 
-    def __add__(self, other: Union["Scalar", float]) -> "Scalar":
-        _other: Scalar = other if isinstance(other, Scalar) else Scalar(other)
-        out: Scalar = Scalar(self.data + _other.data, (self, _other), "+")
+    def __add__(self, other: Union["Tensor", np.ndarray]) -> "Tensor":
+        _other: Tensor = other if isinstance(other, Tensor) else Tensor(other)
+        out: Tensor = Tensor(self.data + _other.data, (self, _other), "+")
 
         def _backward() -> None:
             self.grad += out.grad  # d(out)/d(self) = 1
@@ -48,9 +47,9 @@ class Scalar:
 
         return out
 
-    def __sub__(self, other: Union["Scalar", float]) -> "Scalar":
-        _other: Scalar = other if isinstance(other, Scalar) else Scalar(other)
-        out: Scalar = Scalar(self.data - _other.data, (self, _other), "-")
+    def __sub__(self, other: Union["Tensor", np.ndarray]) -> "Tensor":
+        _other: Tensor = other if isinstance(other, Tensor) else Tensor(other)
+        out: Tensor = Tensor(self.data - _other.data, (self, _other), "-")
 
         def _backward() -> None:
             self.grad += out.grad  # d(out)/d(self) = 1
@@ -60,9 +59,23 @@ class Scalar:
 
         return out
 
-    def __mul__(self, other: Union["Scalar", float]) -> "Scalar":
-        _other = other if isinstance(other, Scalar) else Scalar(other)
-        out = Scalar(self.data * _other.data, (self, _other), "*")
+    def __neg__(self) -> "Tensor":
+        out: Tensor = Tensor(-self.data, (self,), "neg")
+
+        def _backward() -> None:
+            self.grad -= out.grad   # pas sûr ??? TODO
+
+        out._backward = _backward
+
+        return out
+
+
+    def __mul__(self, other: Union["Tensor", np.ndarray]) -> "Tensor":
+        # détecter les scalairs
+        if not isinstance(other, Tensor):
+            raise Exception("cas non géré!")
+        _other = other if isinstance(other, Tensor) else Tensor(other)
+        out = Tensor(self.data * _other.data, (self, _other), "*")
 
         def _backward() -> None:
             self.grad += out.grad * _other.data  # d(out)/d(self) = other
@@ -72,9 +85,9 @@ class Scalar:
 
         return out
 
-    def __truediv__(self, other: Union["Scalar", float]) -> "Scalar":
-        _other = other if isinstance(other, Scalar) else Scalar(other)
-        out = Scalar(self.data / _other.data, (self, _other), "/")
+    def __truediv__(self, other: Union["Tensor", np.ndarray]) -> "Tensor":
+        _other = other if isinstance(other, Tensor) else Tensor(other)
+        out = Tensor(self.data / _other.data, (self, _other), "/")
 
         def _backward() -> None:
             self.grad += out.grad / _other.data  # d(out)/d(self) = 1/other
@@ -85,9 +98,9 @@ class Scalar:
 
         return out
 
-    def exp(self) -> "Scalar":
+    def exp(self) -> "Tensor":
         """Compute exp"""
-        out = Scalar(np.exp(self.data), (self,), "exp")
+        out = Tensor(np.exp(self.data), (self,), "exp")
 
         def _backward() -> None:
             self.grad += out.data
@@ -96,26 +109,27 @@ class Scalar:
 
         return out
 
-    def relu(self) -> "Scalar":
-        """Compute ReLU"""
-
-        out = Scalar(0 if self.data < 0 else self.data, (self,), "ReLU")
-
-        def _backward() -> None:
-            self.grad += (out.data > 0) * out.grad
-
-        out._backward = _backward
-
-        return out
+    # TODO:
+    # def relu(self) -> "Tensor":
+    #     """Compute ReLU"""
+    #
+    #     out = Tensor(0 if self.data < 0 else self.data, (self,), "ReLU")
+    #
+    #     def _backward() -> None:
+    #         self.grad += (out.data > 0) * out.grad
+    #
+    #     out._backward = _backward
+    #
+    #     return out
 
     def backward(self) -> None:
         """Compute gradients through backpropagation"""
 
         # Topological order all of the children in the graph
-        topo: Vector = []
-        visited: Set[Scalar] = set()
+        topo: List[Tensor] = []
+        visited: Set[Tensor] = set()
 
-        def build_topo(node: Scalar) -> None:
+        def build_topo(node: Tensor) -> None:
             if node not in visited:
                 visited.add(node)
                 for child in node._prev:
@@ -125,26 +139,23 @@ class Scalar:
         build_topo(self)
 
         # Go one variable at a time and apply the chain rule to get its gradient
-        self.grad = 1
+        self.grad = np.ones((self.data.shape))
         for node in reversed(topo):
             node._backward()
 
-    def __radd__(self, other: Union["Scalar", float]) -> "Scalar":
+    def __radd__(self, other: Union["Tensor", np.ndarray]) -> "Tensor":
         return self.__add__(other)
 
-    def __rsub__(self, other: Union["Scalar", float]) -> "Scalar":
-        _other = other if isinstance(other, Scalar) else Scalar(other)
+    def __rsub__(self, other: Union["Tensor", np.ndarray]) -> "Tensor":
+        _other = other if isinstance(other, Tensor) else Tensor(other)
         return _other.__sub__(self)
 
-    def __rmul__(self, other: Union["Scalar", float]) -> "Scalar":
+    def __rmul__(self, other: Union["Tensor", np.ndarray]) -> "Tensor":
         return self.__mul__(other)
 
-    def __rtruediv__(self, other: Union["Scalar", float]) -> "Scalar":
-        _other = other if isinstance(other, Scalar) else Scalar(other)
+    def __rtruediv__(self, other: Union["Tensor", np.ndarray]) -> "Tensor":
+        _other = other if isinstance(other, Tensor) else Tensor(other)
         return _other.__truediv__(self)
 
     def __repr__(self) -> str:
-        return f"Scalar(data={self.data}, grad={self.grad})"
-
-
-Vector = List[Scalar]
+        return f"Tensor(data={self.data}, grad={self.grad})"
