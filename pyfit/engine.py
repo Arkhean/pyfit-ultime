@@ -37,76 +37,90 @@ class Tensor:
 
     def __add__(self, other: Union["Tensor", np.ndarray]) -> "Tensor":
         _other: Tensor = other if isinstance(other, Tensor) else Tensor(other)
-        out: Tensor = Tensor(self.data + _other.data, (self, _other), "+")
-
-        def _backward() -> None:
-            self.grad += out.grad  # d(out)/d(self) = 1
-            _other.grad += out.grad  # d(out)/d(other) = 1
-
-        out._backward = _backward
-
-        return out
+        if self.data.shape == _other.data.shape:
+            out: Tensor = Tensor(self.data + _other.data, (self, _other), "+")
+            def _backward() -> None:
+                self.grad += out.grad  # d(out)/d(self) = 1
+                _other.grad += out.grad  # d(out)/d(other) = 1
+            out._backward = _backward
+            return out
+        else:
+            raise Exception(f'bad shapes: {self.data.shape} and {_other.data.shape}')
 
     def __sub__(self, other: Union["Tensor", np.ndarray]) -> "Tensor":
         _other: Tensor = other if isinstance(other, Tensor) else Tensor(other)
-        out: Tensor = Tensor(self.data - _other.data, (self, _other), "-")
-
-        def _backward() -> None:
-            self.grad += out.grad  # d(out)/d(self) = 1
-            _other.grad -= out.grad  # d(out)/d(other) = -1
-
-        out._backward = _backward
-
-        return out
+        if self.data.shape == _other.data.shape:
+            out: Tensor = Tensor(self.data - _other.data, (self, _other), "-")
+            def _backward() -> None:
+                self.grad += out.grad  # d(out)/d(self) = 1
+                _other.grad -= out.grad  # d(out)/d(other) = -1
+            out._backward = _backward
+            return out
+        else:
+            raise Exception(f'bad shapes: {self.data.shape} and {_other.data.shape}')
 
     def __neg__(self) -> "Tensor":
         out: Tensor = Tensor(-self.data, (self,), "neg")
-
         def _backward() -> None:
             self.grad -= out.grad   # pas sûr ??? TODO
-
         out._backward = _backward
-
         return out
 
-
     def __mul__(self, other: Union["Tensor", np.ndarray]) -> "Tensor":
-        # détecter les scalairs
-        if not isinstance(other, Tensor):
-            raise Exception("cas non géré!")
         _other = other if isinstance(other, Tensor) else Tensor(other)
-        out = Tensor(self.data * _other.data, (self, _other), "*")
-
-        def _backward() -> None:
-            self.grad += out.grad * _other.data  # d(out)/d(self) = other
-            _other.grad += out.grad * self.data  # d(out)/d(other) = self
-
+        if self.data.shape == _other.data.shape:
+            # il faut les mêmes dimensions!
+            out = Tensor(self.data * _other.data, (self, _other), "*")
+            def _backward() -> None:
+                self.grad += out.grad * _other.data  # d(out)/d(self) = other
+                _other.grad += out.grad * self.data  # d(out)/d(other) = self
+        elif _other.data.shape == ():
+            # multiplication par un scalaire
+            out = Tensor(self.data * _other.data, (self, _other), "*")
+            def _backward() -> None:
+                self.grad += out.grad * _other.data  # d(out)/d(self) = other
+        else:
+            raise Exception(f'bad shapes: {self.data.shape} and {_other.data.shape}')
         out._backward = _backward
-
         return out
 
     def __truediv__(self, other: Union["Tensor", np.ndarray]) -> "Tensor":
         _other = other if isinstance(other, Tensor) else Tensor(other)
-        out = Tensor(self.data / _other.data, (self, _other), "/")
-
-        def _backward() -> None:
-            self.grad += out.grad / _other.data  # d(out)/d(self) = 1/other
-            # d(out)/d(other) = -self/(other*other)
-            _other.grad += out.grad * (-self.data / (_other.data * _other.data))
-
+        if self.data.shape == _other.data.shape:
+            # il faut les mêmes dimensions!
+            out = Tensor(self.data / _other.data, (self, _other), "/")
+            def _backward() -> None:
+                self.grad += out.grad / _other.data  # d(out)/d(self) = 1/other
+                # d(out)/d(other) = -self/(other*other)
+                _other.grad += out.grad * (-self.data / (_other.data * _other.data))
+        elif _other.data.shape == ():
+            # division par un scalaire
+            out = Tensor(self.data / _other.data, (self, _other), "/")
+            def _backward() -> None:
+                self.grad += out.grad / _other.data  # d(out)/d(self) = 1/other
+        else:
+            raise Exception(f'bad shapes: {self.data.shape} and {_other.data.shape}')
         out._backward = _backward
+        return out
 
+    def dot(self, other: Union["Tensor", np.ndarray]) -> "Tensor":
+        _other = other if isinstance(other, Tensor) else Tensor(other)
+        if self.data.shape[1] == _other.data.shape[0]:
+            out = Tensor(self.data.dot(_other.data), (self, _other), "dot")
+            def _backward() -> None:
+                self.grad += 0# TODO!
+                _other.grad += 0
+        else:
+            raise Exception(f'bad shapes: {self.data.shape} and {_other.data.shape}')
+        out._backward = _backward
         return out
 
     def exp(self) -> "Tensor":
         """Compute exp"""
         out = Tensor(np.exp(self.data), (self,), "exp")
-
         def _backward() -> None:
             self.grad += out.data
-
         out._backward = _backward
-
         return out
 
     # TODO:

@@ -6,7 +6,7 @@ Heavily inspired by https://github.com/karpathy/micrograd/blob/master/micrograd/
 
 import random
 from typing import List
-from pyfit.engine import Scalar, Vector
+from pyfit.engine import Tensor
 from pyfit.activation import *
 
 
@@ -16,10 +16,10 @@ class Module:
     def zero_grad(self) -> None:
         """Reset gradients for all parameters"""
 
-        for p in self.parameters():
+        for p in self.parameters(): # TODO:
             p.grad = 0
 
-    def parameters(self) -> Vector:
+    def parameters(self) -> Tensor:
         """Return parameters"""
 
         raise NotImplementedError
@@ -28,37 +28,45 @@ class Module:
 class Neuron(Module):
     """A single neuron"""
 
-    def __init__(self, in_features: int, nonlin: bool = True, activation: str = 'linear'):
-        self.w: Vector = [Scalar(random.uniform(-1, 1)) for _ in range(in_features)]
-        self.b: Scalar = Scalar(0)
-        self.nonlin = nonlin or activation != 'linear'
-        self.activation = activation_functions[activation]
+    def __init__(self, in_features: int, activation: str = 'linear'):
+        self.w: Tensor = Tensor([random.uniform(-1, 1) for _ in range(in_features)])
+        self.b: Tensor = Tensor(0)
+        self.nonlin = activation != 'linear'
+        self.activation = ACTIVATION_FUNCTIONS[activation]
 
-    def __call__(self, x: Vector) -> Scalar:
-        act: Scalar = sum((wi * xi for wi, xi in zip(self.w, x)), self.b)
-        return act.relu() if self.nonlin else act
+    def __call__(self, x: Tensor) -> Tensor:
+        act: Tensor = x * sel.w + self.b
+        if self.nonlin:
+            return self.activation(act)
+        return act
 
-    def parameters(self) -> Vector:
-        return self.w + [self.b]
+    def parameters(self) -> Tensor:
+        return self.w + [self.b] # TODO: concat?, référence et numpy ???
 
     def __repr__(self) -> str:
-        return f"{'ReLU' if self.nonlin else 'Linear'}Neuron({len(self.w)})"
+        return f"{self.activation} Neuron({len(self.w)})"
 
-# TODO: use Vector and activations
 class Layer(Module):
     """A layer of neurons"""
 
-    def __init__(self, in_features: int, out_features: int, nonlin: bool = True):
-        self.neurons = [Neuron(in_features, nonlin) for _ in range(out_features)]
+    def __init__(self, in_features: int, out_features: int, activation: str = 'linear'):
+        self.w = Tensor(2 * np.random.randomm_sample((in_features, out_features)) - 1)
+        self.b = Tensor(2 * np.random.randomm_sample((out_features)) - 1)
+        self.nonlin = activation != 'linear'
+        self.activation = ACTIVATION_FUNCTIONS[activation]
 
-    def __call__(self, x: Vector) -> Vector:
-        return [n(x) for n in self.neurons]
+    def __call__(self, x: Tensor) -> Tensor:
+        act: Tensor = x.dot(sel.w) + self.b
+        if self.nonlin:
+            return self.activation(act)
+        return act
 
-    def parameters(self) -> Vector:
+    def parameters(self) -> Tensor:
+        # TODO garder les références!
         return [p for n in self.neurons for p in n.parameters()]
 
     def __repr__(self) -> str:
-        return f"Layer of [{', '.join(str(n) for n in self.neurons)}]"
+        return f"Layer of {self.activation} Neurons({len(self.w)})"
 
 # TODO: add layers
 class MLP(Module):

@@ -4,14 +4,14 @@ Optimization algorithms for gradient descent
 
 # pylint: disable=too-few-public-methods
 
-from pyfit.engine import Vector
+from pyfit.engine import Tensor
 
 
 class Optimizer:
     """Base class for optimizers"""
 
-    def __init__(self, parameters: Vector):
-        self.parameters: Vector = parameters
+    def __init__(self, parameters: Tensor):
+        self.parameters: Tensor = parameters
 
     def zero_grad(self) -> None:
         """Reset gradients for all parameters"""
@@ -23,7 +23,7 @@ class Optimizer:
 class SGD(Optimizer):
     """Stochastic Gradient Descent optimizer"""
 
-    def __init__(self, parameters: Vector, learning_rate: float = 0.01):
+    def __init__(self, parameters: Tensor, learning_rate: float = 0.01):
         super().__init__(parameters)
         self.learning_rate = learning_rate
 

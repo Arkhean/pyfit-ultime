@@ -31,4 +31,4 @@ def tanh(x: Tensor) -> Tensor:
     return 2 * sigmoid(2 * x) - 1
 
 
-ACTIVATION_FUNCTIONS = {'sigmoid': sigmoid, 'tanh': tanh}
+ACTIVATION_FUNCTIONS = {'sigmoid': sigmoid, 'tanh': tanh, 'linear': None}
