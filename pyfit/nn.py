@@ -1,136 +1,91 @@
 """
-Implémentation des réseaux de neurones
+code from pbesquet and modified
+Neural network providing a PyTorch-like API.
+Heavily inspired by https://github.com/karpathy/micrograd/blob/master/micrograd/nn.py
 """
-from typing import Union, Optional, Callable, List
-import numpy as np
 
-T = Union[float, np.ndarray]
+import random
+from typing import List
+from pyfit.engine import Tensor
+from pyfit.activation import *
 
-class Layer:
-    """
-    interface for neural network layers
-    """
-    def __init__(self,
-            input_size: int,
-            output_size: int,
-            activation_function: Callable[[T, bool], T]) -> None:
-        self.input_size = input_size
-        self.output_size = output_size
-        self.activation_function = activation_function
 
-    def back(self, x: np.ndarray, delta: np.ndarray, alpha: float) -> np.ndarray:
-        """
-        abstract, update the weights, return delta for next layer
-        """
+class Module:
+    """A differentiable computation"""
 
-    def predict(self, x: np.ndarray) -> np.ndarray:
-        """
-        abstract, make a prediction from this layer
-        """
+    def zero_grad(self) -> None:
+        """Reset gradients for all parameters"""
 
-class NeuronLayer(Layer):
-    """
-    simple layer of neurons fully connected
-    """
-    def __init__(self,
-            input_size: int,
-            output_size: int,
-            activation_function: Callable[[T, Optional[bool]], T]) -> None:
-        Layer.__init__(self, input_size, output_size, activation_function)
-        self._weights = 2 * np.random.random_sample((input_size, output_size)) - 1
-        self._bias = 2 * np.random.random_sample((output_size)) - 1
+        for p in self.parameters(): # TODO:
+            p.grad = 0
 
-    def back(self, x: np.ndarray, delta: np.ndarray, alpha: float) -> np.ndarray:
-        """
-        update the weights, return delta for next layer
-        """
-        # compute gradient
-        d_bias = delta * self.activation_function(x.dot(self._weights) + self._bias, True)
-        d_weights = x.transpose().dot(d_bias)
-        # save data for return
-        tmp = self._weights.transpose()
-        # update weights
-        self._weights -= (d_weights * alpha)
-        self._bias -= (d_bias * alpha)
-        # return next delta
-        return d_bias.dot(tmp)
+    def parameters(self) -> Tensor:
+        """Return parameters"""
 
-    def predict(self, x: np.ndarray) -> np.ndarray:
-        """
-        make a prediction from this layer
-        """
-        return self.activation_function(x.dot(self._weights) + self._bias)
+        raise NotImplementedError
 
-# class DropoutLayer(Layer):
-#     """
-#     layer where some neurons are put to zero
-#     """
-#     def __init__(self, probability: float):
-#         Layer.__init__(self, None, None, None)
-#         self.probability = probability
-#
-#     def back(self, x: np.ndarray, delta: np.ndarray, alpha: float) -> np.ndarray:
-#         """
-#         do nothing
-#         """
-#         return delta
-#
-#     def predict(self, x: np.ndarray) -> np.ndarray:
-#         """
-#         put some neurons to zero
-#         """
-#         for i in range(len(x)):
-#             if np.random.random_sample() < self.probability:
-#                 x[i] = 0
-#         return x
+# TODO: activations...
+class Neuron(Module):
+    """A single neuron"""
 
-################################################################################
+    def __init__(self, in_features: int, activation: str = 'linear'):
+        self.w: Tensor = Tensor([random.uniform(-1, 1) for _ in range(in_features)])
+        self.b: Tensor = Tensor(0)
+        self.nonlin = activation != 'linear'
+        self.activation = ACTIVATION_FUNCTIONS[activation]
 
-class NeuralNetwork:
-    """
-    class containing all the layers of a neural network
-    """
-    def __init__(self, learning_rate: float) -> None:
-        self.layers: List[Layer] = list()
-        self.learning_rate = learning_rate
+    def __call__(self, x: Tensor) -> Tensor:
+        act: Tensor = x * sel.w + self.b
+        if self.nonlin:
+            return self.activation(act)
+        return act
 
-    def one_step(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """
-        compute one step of gradient descent
-        """
-        # TODO optimiser
-        x = np.array(x)
-        y = np.array(y).reshape((-1, 1))
-        intermediate_values = [x]
+    def parameters(self) -> Tensor:
+        return self.w + [self.b] # TODO: concat?, référence et numpy ???
+
+    def __repr__(self) -> str:
+        return f"{self.activation} Neuron({len(self.w)})"
+
+class Layer(Module):
+    """A layer of neurons"""
+
+    def __init__(self, in_features: int, out_features: int, activation: str = 'linear'):
+        self.w = Tensor(2 * np.random.randomm_sample((in_features, out_features)) - 1)
+        self.b = Tensor(2 * np.random.randomm_sample((out_features)) - 1)
+        self.nonlin = activation != 'linear'
+        self.activation = ACTIVATION_FUNCTIONS[activation]
+
+    def __call__(self, x: Tensor) -> Tensor:
+        act: Tensor = x.dot(sel.w) + self.b
+        if self.nonlin:
+            return self.activation(act)
+        return act
+
+    def parameters(self) -> Tensor:
+        # TODO garder les références!
+        return [p for n in self.neurons for p in n.parameters()]
+
+    def __repr__(self) -> str:
+        return f"Layer of {self.activation} Neurons({len(self.w)})"
+
+# TODO: add layers
+class MLP(Module):
+    """A Multi-Layer Perceptron, aka shallow neural network"""
+
+    def __init__(self, input_features: int, layers: List[int]):
+        sizes: List[int] = [input_features] + layers
+        self.layers = [
+            Layer(sizes[i], sizes[i + 1], nonlin=i != len(layers) - 1)
+            for i in range(len(layers))
+        ]
+
+    def __call__(self, x: Vector) -> Vector:
         for layer in self.layers:
-            intermediate_values.append(layer.predict(intermediate_values[-1]))
-        delta = intermediate_values[-1] - y
-        for i in range(len(self.layers)):
-            delta = self.layers[-i-1].back(intermediate_values[-i-2], delta, self.learning_rate)
-
-    def predict(self, x: np.ndarray) -> np.ndarray:
-        """
-        compute x through the whole network
-        """
-        for layer in self.layers:
-            x = layer.predict(x)
+            x = layer(x)
         return x
 
-    def add_layer(self, new_layer: Layer) -> None:
-        """
-        add a layer to the network
-        """
-        last_output_size = None
-        for layer in reversed(self.layers):
-            if layer.output_size is not None:
-                last_output_size = layer.output_size
-                break
-        if last_output_size is None or last_output_size == new_layer.input_size:
-            self.layers.append(new_layer)
-        else:
-            raise ValueError(
-                f"input_size ({new_layer.input_size}) does not match last layer \
-                output_size ({last_output_size})"
-            )
+    def parameters(self) -> Vector:
+        return [p for layer in self.layers for p in layer.parameters()]
 
-    # TODO: summarize
+    def __repr__(self) -> str:
+        return f"MLP of [{', '.join(str(layer) for layer in self.layers)}]"

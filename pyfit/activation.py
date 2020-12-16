@@ -4,29 +4,31 @@ Fonctions d'activation utiles aux réseaux de neurones
 
 from typing import Union
 import numpy as np
+from pyfit.engine import Tensor
 
-T = Union[float, np.ndarray]
+T = Union[Tensor, np.ndarray]
 
-def sigmoid(x: T, deriv: bool = False) -> T:
+def sigmoid(x: Tensor) -> Tensor:
     """
     sigmoid function 1 / (1+exp(-x))
     """
-    if deriv:
-        return np.exp(-x) / ((1+np.exp(-x)) ** 2)
-    return 1 / (1 + np.exp(-x))
+    if not isinstance(x, Tensor):
+        return 1 / (1 + np.exp(-x))
+    return 1 / (1 + (-x).exp())
 
-def relu(x: T, deriv: bool = False) -> T:
-    """
-    relu function max(x, 0)
-    """
-    if deriv:
-        return 1 if x > 0 else 0
-    return x if x > 0 else 0
+# def relu(x: Tensor) -> Tensor:
+#     """
+#     relu function max(x, 0)
+#     """
+#     if deriv:
+#         return 1 if x > 0 else 0
+#     return x if x > 0 else 0
 
-def tanh(x: T, deriv: bool = False) -> T:
+def tanh(x: Tensor) -> Tensor:
     """
     tanh function sinh(x) / cosh(x)
     """
-    if deriv:
-        return 1 - np.tanh(x) ** 2
-    return np.tanh(x)
+    return 2 * sigmoid(2 * x) - 1
+
+
+ACTIVATION_FUNCTIONS = {'sigmoid': sigmoid, 'tanh': tanh, 'linear': None}

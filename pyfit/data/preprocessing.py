@@ -1,8 +1,7 @@
 """
 this module include scaling, one hot encoding
 """
-
-from typing import Any, List, Tuple
+from typing import Any, List, Dict
 import numpy as np
 from pyfit.engine import as_array
 
@@ -37,9 +36,9 @@ class OneHotEncoder():
     """
     def __init__(self) -> None:
         """initialize self"""
-        self.categories_ = list()
+        self.categories_: List[Dict[Any, int]] = list()
         self.n_features = 0
-        self.cat_count = list()
+        self.cat_count: List[int] = list()
 
     def fit(self, x: np.ndarray) -> None:
         """Fit OneHotEncoder to X."""
