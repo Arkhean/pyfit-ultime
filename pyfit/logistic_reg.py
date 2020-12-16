@@ -10,8 +10,8 @@ class LogisticReg:
     def __init__(self,
                 x_train: np.ndarray,
                 y_train: np.ndarray,
-                learning_rate=0.01,
-                max_iter=20) -> None:
+                learning_rate = 0.01,
+                max_iter = 20) -> None:
         x_train_t = np.transpose(x_train)
         #add column
         x_train_1 = self.passage_x1(x_train)
