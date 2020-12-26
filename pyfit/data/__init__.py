@@ -1,12 +1,18 @@
 """
 data processing functions
 """
+
+# pylint: disable=too-few-public-methods
+
 from typing import Any, List, Tuple
 import random
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 from pyfit.engine import as_array
+from typing import NamedTuple, Iterator
+from pyfit.engine import Tensor
+
 
 def train_test_split(*arrays: Any, **options: Any) -> List[Any]:
     """
@@ -62,3 +68,24 @@ def plot_data(x: np.ndarray, y: np.ndarray) -> None:
     ax.add_artist(legend1)
     plt.xlim((min(x[:, 0]) - 0.1, max(x[:, 0]) + 0.1))
     plt.ylim((min(x[:, 1]) - 0.1, max(x[:, 1]) + 0.1))
+
+
+Batch = NamedTuple("Batch", [("inputs", Tensor), ("targets", Tensor)])
+
+class BatchIterator:
+    """Batch iterator"""
+
+    def __init__(self, batch_size: int = 32, shuffle: bool = True) -> None:
+        self.batch_size = batch_size
+        self.shuffle = shuffle
+
+    def __call__(self, inputs: Tensor, targets: Tensor) -> Iterator[Batch]:
+        starts = list(range(0, len(inputs), self.batch_size))
+        if self.shuffle:
+            random.shuffle(starts)
+
+        for start in starts:
+            end = start + self.batch_size
+            batch_inputs = Tensor(inputs[start:end])
+            batch_targets = Tensor(targets[start:end])
+            yield Batch(batch_inputs, batch_targets)
