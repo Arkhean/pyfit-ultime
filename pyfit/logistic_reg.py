@@ -12,10 +12,10 @@ class LogisticReg:
                 y_train: np.ndarray,
                 learning_rate=0.01,
                 max_iter=100) -> None:
-        x_train_t = np.transpose(x_train)
         m = len(x_train[0])
         #add column
         x_train_1 = self.passage_x1(x_train)
+        x_train_t = np.transpose(x_train_1)
         self.theta = np.random.random((m+1, 1))
         nb_iter = 1
         inter = sigmoid(np.matmul(x_train_1, self.theta)) - y_train
@@ -27,6 +27,7 @@ class LogisticReg:
             grad_theta = (2 / m) * np.matmul(x_train_t, inter)
             self.theta = self.theta - learning_rate * grad_theta
             nb_iter += 1
+        # pb dans le calcul de grad_teta
         print(nb_iter)
 
     def passage_x1(self, x_entree: np.ndarray) -> np.ndarray:

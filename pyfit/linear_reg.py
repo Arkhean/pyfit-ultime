@@ -9,9 +9,9 @@ class LinearReg:
             y_train: np.ndarray,
             learning_rate=0.2,
             max_iter=20) -> None:
-        x_train_t = np.transpose(x_train)
         #add column
         x_train_1 = self.passage_x1(x_train)
+        x_train_t = np.transpose(x_train_1)
         self.theta = np.random.random((len(x_train[0])+1, 1))
         nb_iter = 1
         inter = np.matmul(x_train_1, self.theta) - y_train
