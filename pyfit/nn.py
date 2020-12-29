@@ -55,7 +55,6 @@ class Layer(Module):
         self.activation = ACTIVATION_FUNCTIONS[activation]
 
     def __call__(self, x: Tensor) -> Tensor:
-        print("layer!")
         act: Tensor = x.dot(self.w) + self.b
         if self.nonlin:
             return self.activation(act)

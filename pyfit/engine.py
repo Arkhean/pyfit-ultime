@@ -38,6 +38,12 @@ class Tensor:
     def __len__(self):
         return len(self.data)
 
+    def __getitem__(self, i):
+        """return new Tensor from slice, this is not a copy"""
+        new_tensor = Tensor(self.data[i])
+        new_tensor.grad = self.grad[i]
+        return new_tensor
+
     def __add__(self, other: Union["Tensor", np.ndarray]) -> "Tensor":
         _other: Tensor = other if isinstance(other, Tensor) else Tensor(other)
         if self.data.shape == _other.data.shape:
@@ -45,10 +51,15 @@ class Tensor:
             def _backward() -> None:
                 self.grad += out.grad  # d(out)/d(self) = 1
                 _other.grad += out.grad  # d(out)/d(other) = 1
-            out._backward = _backward
-            return out
+        elif _other.data.shape == ():
+            # addition avec un scalaire
+            out = Tensor(self.data + _other.data, (self, _other), "+")
+            def _backward() -> None:
+                self.grad += out.grad
         else:
             raise Exception(f'bad shapes: {self.data.shape} and {_other.data.shape}')
+        out._backward = _backward
+        return out
 
     def __sub__(self, other: Union["Tensor", np.ndarray]) -> "Tensor":
         _other: Tensor = other if isinstance(other, Tensor) else Tensor(other)
@@ -106,10 +117,18 @@ class Tensor:
         out._backward = _backward
         return out
 
+    def __pow__(self, other: int) -> "Tensor":
+        if isinstance(other, int):
+            out = Tensor(self.data ** other, (self), "**")
+            def _backward() -> None:
+                self.grad += other * (self.data ** (other - 1))
+        else:
+            raise Exception('second argument must be an integer')
+        out._backward = _backward
+        return out
+
     def dot(self, other: Union["Tensor", np.ndarray]) -> "Tensor":
         _other = other if isinstance(other, Tensor) else Tensor(other)
-        print(self.data.shape[-1])
-        print(_other.data.shape[0])
         if self.data.shape[-1] == _other.data.shape[0]:
             out = Tensor(self.data.dot(_other.data), (self, _other), "dot")
             def _backward() -> None:
@@ -131,14 +150,10 @@ class Tensor:
     # TODO:
     # def relu(self) -> "Tensor":
     #     """Compute ReLU"""
-    #
     #     out = Tensor(0 if self.data < 0 else self.data, (self,), "ReLU")
-    #
     #     def _backward() -> None:
     #         self.grad += (out.data > 0) * out.grad
-    #
     #     out._backward = _backward
-    #
     #     return out
 
     def backward(self) -> None:

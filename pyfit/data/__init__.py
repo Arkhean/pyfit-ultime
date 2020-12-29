@@ -72,6 +72,9 @@ def plot_data(x: np.ndarray, y: np.ndarray) -> None:
 
 Batch = NamedTuple("Batch", [("inputs", Tensor), ("targets", Tensor)])
 
+################################################################################
+# does not work with Tensor TODO
+
 class BatchIterator:
     """Batch iterator"""
 
