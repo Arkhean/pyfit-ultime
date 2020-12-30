@@ -28,6 +28,8 @@ def tanh(x: Tensor) -> Tensor:
     """
     tanh function sinh(x) / cosh(x)
     """
+    if not isinstance(x, Tensor):
+        return 1 / (1 + np.exp(-x))
     return 2 * sigmoid(2 * x) - 1
 
 

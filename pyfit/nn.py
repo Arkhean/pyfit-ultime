@@ -6,8 +6,9 @@ Heavily inspired by https://github.com/karpathy/micrograd/blob/master/micrograd/
 
 import random
 from typing import List
+import numpy as np
 from pyfit.engine import Tensor
-from pyfit.activation import *
+from pyfit.activation import ACTIVATION_FUNCTIONS
 
 
 class Module:
@@ -19,7 +20,7 @@ class Module:
         for p in self.parameters():
             p.grad = np.zeros((p.grad.shape))
 
-    def parameters(self) -> Tensor:
+    def parameters(self) -> List[Tensor]:
         """Return parameters"""
 
         raise NotImplementedError
@@ -35,7 +36,7 @@ class Neuron(Module):
 
     def __call__(self, x: Tensor) -> Tensor:
         act: Tensor = x.dot(self.w) + self.b
-        if self.nonlin:
+        if self.nonlin and self.activation is not None:
             return self.activation(act)
         return act
 
@@ -56,7 +57,7 @@ class Layer(Module):
 
     def __call__(self, x: Tensor) -> Tensor:
         act: Tensor = x.dot(self.w) + self.b
-        if self.nonlin:
+        if self.nonlin and self.activation is not None:
             return self.activation(act)
         return act
 
@@ -69,10 +70,10 @@ class Layer(Module):
 class MLP(Module):
     """A Multi-Layer Perceptron, aka shallow neural network"""
 
-    def __init__(self):
-        self.layers = list()
+    def __init__(self) -> None:
+        self.layers: List[Layer] = list()
 
-    def add(self, layer):
+    def add(self, layer: Layer) -> None:
         # TODO: check dimensions
         self.layers.append(layer)
 
@@ -81,8 +82,11 @@ class MLP(Module):
             x = layer(x)
         return x
 
-    def parameters(self) -> Tensor:
-        return [p for layer in self.layers for p in layer.parameters()]
+    def parameters(self) -> List[Tensor]:
+        res = list()
+        for layer in self.layers:
+            res += layer.parameters()
+        return res
 
     def __repr__(self) -> str:
         return f"MLP of [{', '.join(str(layer) for layer in self.layers)}]"
