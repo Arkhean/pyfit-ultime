@@ -32,5 +32,4 @@ class SGD(Optimizer):
         """Update model parameters in the opposite direction of their gradient"""
 
         for p in self.parameters:
-            print(f"optimizer : {p.grad}")
             p.data -= self.learning_rate * p.grad

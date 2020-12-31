@@ -20,22 +20,22 @@ def test_tensor_add_tensor() -> None:
     x = Tensor([2, 1])
     y = Tensor([1, 1])
     z = x + y
-    assert np.array_equal(z.data, [3, 2])
+    assert np.array_equal(z.data, [[3, 2]])
     z.backward()
-    assert np.array_equal(x.grad, [1, 1])
-    assert np.array_equal(y.grad, [1, 1])
+    assert np.array_equal(x.grad, [[1, 1]])
+    assert np.array_equal(y.grad, [[1, 1]])
 
 def test_tensor_add_scalar() -> None:
     x = Tensor([2, 1])
     y = x + 1
-    assert np.array_equal(y.data, [3, 2])
+    assert np.array_equal(y.data, [[3, 2]])
     y.backward()
-    assert np.array_equal(x.grad, [1, 1])
+    assert np.array_equal(x.grad, [[1, 1]])
     x = Tensor([2, 1])
     z = 1 + x
-    assert np.array_equal(z.data, [3, 2])
+    assert np.array_equal(z.data, [[3, 2]])
     z.backward()
-    assert np.array_equal(x.grad, [1, 1])
+    assert np.array_equal(x.grad, [[1, 1]])
 
 ################################################################################
 
@@ -51,13 +51,13 @@ def test_tensor_sub_tensor() -> None:
 def test_tensor_sub_scalar() -> None:
     x = Tensor([2, 1])
     y = x - 1
-    assert np.array_equal(y.data, [1, 0])
+    assert np.array_equal(y.data, [[1, 0]])
     y.backward()
-    assert np.array_equal(x.grad, [1, 1])
+    assert np.array_equal(x.grad, [[1, 1]])
     z = 1 - x
-    assert np.array_equal(z.data, [-1, 0])
+    assert np.array_equal(z.data, [[-1, 0]])
     z.backward()
-    assert np.array_equal(x.grad, [0, 0])
+    assert np.array_equal(x.grad, [[0, 0]])
 
 ################################################################################
 
@@ -65,19 +65,19 @@ def test_tensor_mul_tensor() -> None:
     x = Tensor([2, 1])
     y = Tensor([1, 1])
     z = x * y
-    assert np.array_equal(z.data, [2, 1])
+    assert np.array_equal(z.data, [[2, 1]])
     z.backward()
-    assert np.array_equal(x.grad, [1, 1])
-    assert np.array_equal(y.grad, [2, 1])
+    assert np.array_equal(x.grad, [[1, 1]])
+    assert np.array_equal(y.grad, [[2, 1]])
 
 def test_tensor_mul_scalar() -> None:
     x = Tensor([2, 1])
     y = 2 * x
-    assert np.array_equal(y.data, [4, 2])
+    assert np.array_equal(y.data, [[4, 2]])
     y.backward()
-    assert np.array_equal(x.grad, [2, 2])
+    assert np.array_equal(x.grad, [[2, 2]])
     z = x * 3
-    assert np.array_equal(z.data, [6, 3])
+    assert np.array_equal(z.data, [[6, 3]])
 
 ################################################################################
 
@@ -93,11 +93,11 @@ def test_tensor_div_tensor() -> None:
 def test_tensor_div_scalar() -> None:
     x = Tensor([2, 1])
     y = x / 2
-    assert np.array_equal(y.data, [1, 0.5])
+    assert np.array_equal(y.data, [[1, 0.5]])
     y.backward()
-    assert np.array_equal(x.grad, [0.5, 0.5])
+    assert np.array_equal(x.grad, [[0.5, 0.5]])
     z = 1 / x
-    assert np.array_equal(z.data, [0.5, 1])
+    assert np.array_equal(z.data, [[0.5, 1]])
 
 ################################################################################
 
@@ -105,16 +105,16 @@ def test_tensor_dot() -> None:
     x = Tensor([1, 1])
     a = Tensor([[1, 2], [3, 4]])
     y = x.dot(a)
-    assert np.array_equal(y.data, [4, 6])
+    assert np.array_equal(y.data, [[4, 6]])
     y.backward()
-    
+
 
 ################################################################################
 
 def test_tensor_pow_scalar() -> None:
     x = Tensor([2, 1])
     y = x ** 2
-    assert np.array_equal(y.data, [4, 1])
+    assert np.array_equal(y.data, [[4, 1]])
 
 ################################################################################
 

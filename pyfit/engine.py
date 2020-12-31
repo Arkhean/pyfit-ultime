@@ -16,6 +16,14 @@ def as_tensor(x: Any) -> "Tensor":
         return Tensor(x)
     return x
 
+def as_array(x: Any) -> np.ndarray:
+    """
+    convert list to ndarray if necessary
+    """
+    if not isinstance(x, np.ndarray):
+        return np.array(x)
+    return x
+
 ################################################################################
 
 
@@ -25,8 +33,9 @@ class Tensor:
     def __init__(
         self, data: np.ndarray, children: Tuple["Tensor", ...] = (), op: str = ""
     ) -> None:
-        self.data: np.ndarray = np.array(data)
+        self.data: np.ndarray = np.atleast_2d(data)
         self.grad: np.ndarray = np.zeros(self.data.shape)
+        self.shape = self.data.shape
 
         # Internal variables used for autograd graph construction
         self._backward: Callable = lambda: None
@@ -44,7 +53,7 @@ class Tensor:
     def __getitem__(self, i: Any) -> "Tensor":
         """return new Tensor from slice, this is not a copy"""
         new_tensor = Tensor(self.data[i])
-        new_tensor.grad = self.grad[i]
+        new_tensor.grad = np.atleast_2d(self.grad[i])
         return new_tensor
 
     def mean(self):
@@ -55,12 +64,10 @@ class Tensor:
         return out
 
     # def abs(self):
-    #     self.data = np.abs(self.data)
-    #     self.grad =
+    #     pass
     #
     # def log(self):
-    #     self.data = np.log(self.data)
-    #     self.grad =
+    #     pass
 
     def __add__(self, other: Union["Tensor", np.ndarray, float]) -> "Tensor":
         _other: Tensor = other if isinstance(other, Tensor) else Tensor(other)
@@ -69,7 +76,7 @@ class Tensor:
             def _backward() -> None:
                 self.grad += out.grad  # d(out)/d(self) = 1
                 _other.grad += out.grad  # d(out)/d(other) = 1
-        elif _other.data.shape == ():
+        elif _other.data.shape == (1,1):
             # addition avec un scalaire
             out = Tensor(self.data + _other.data, (self, _other), "+")
             def _backward() -> None:
@@ -86,12 +93,12 @@ class Tensor:
             def _backward() -> None:
                 self.grad += out.grad  # d(out)/d(self) = 1
                 _other.grad -= out.grad  # d(out)/d(other) = -1
-        elif _other.data.shape == ():
+        elif _other.data.shape == (1,1):
             # soustraction avec un scalaire
             out = Tensor(self.data - _other.data, (self, _other), "-")
             def _backward() -> None:
                 self.grad += out.grad
-        elif self.data.shape == ():
+        elif self.data.shape == (1,1):
             # soustraction avec un scalaire
             out = Tensor(self.data - _other.data, (self, _other), "-")
             def _backward() -> None:
@@ -104,7 +111,7 @@ class Tensor:
     def __neg__(self) -> "Tensor":
         out: Tensor = Tensor(-self.data, (self,), "neg")
         def _backward() -> None:
-            self.grad -= out.grad   # pas sûr ??? TODO
+            self.grad -= out.grad
         out._backward = _backward
         return out
 
@@ -116,7 +123,7 @@ class Tensor:
             def _backward() -> None:
                 self.grad += out.grad * _other.data  # d(out)/d(self) = other
                 _other.grad += out.grad * self.data  # d(out)/d(other) = self
-        elif _other.data.shape == ():
+        elif _other.data.shape == (1,1):
             # multiplication par un scalaire
             out = Tensor(self.data * _other.data, (self, _other), "*")
             def _backward() -> None:
@@ -135,12 +142,12 @@ class Tensor:
                 self.grad += out.grad / _other.data  # d(out)/d(self) = 1/other
                 # d(out)/d(other) = -self/(other*other)
                 _other.grad += out.grad * (-self.data / (_other.data * _other.data))
-        elif _other.data.shape == ():
+        elif _other.data.shape == (1,1):
             # division par un scalaire
             out = Tensor(self.data / _other.data, (self, _other), "/")
             def _backward() -> None:
                 self.grad += out.grad / _other.data  # d(out)/d(self) = 1/other
-        elif self.data.shape == ():
+        elif self.data.shape == (1,1):
             # division par un scalaire
             out = Tensor(self.data / _other.data, (self, _other), "/")
             def _backward() -> None:
@@ -165,8 +172,8 @@ class Tensor:
         if self.data.shape[-1] == _other.data.shape[0]:
             out = Tensor(self.data.dot(_other.data), (self, _other), "dot")
             def _backward() -> None:
-                self.grad += out.grad * (out.grad @ _other.data.T)
-                _other.grad += out.grad * (self.data.T @ out.grad)
+                self.grad += out.grad.dot(_other.data.T)
+                _other.grad += self.data.T.dot(out.grad)
         else:
             raise Exception(f'bad shapes: {self.data.shape} and {_other.data.shape}')
         out._backward = _backward

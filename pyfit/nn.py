@@ -29,8 +29,8 @@ class Neuron(Module):
     """A single neuron"""
 
     def __init__(self, in_features: int, activation: str = 'linear'):
-        self.w: Tensor = Tensor([random.uniform(-1, 1) for _ in range(in_features)])
-        self.b: Tensor = Tensor(0)
+        self.w: Tensor = Tensor(2 * np.random.random_sample((in_features, 1)) - 1)
+        self.b: Tensor = Tensor(2 * np.random.random_sample((1)) - 1)
         self.nonlin = activation != 'linear'
         self.activation = ACTIVATION_FUNCTIONS[activation]
 
