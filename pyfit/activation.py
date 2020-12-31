@@ -16,13 +16,13 @@ def sigmoid(x: Tensor) -> Tensor:
         return 1 / (1 + np.exp(-x))
     return 1 / (1 + (-x).exp())
 
-# def relu(x: Tensor) -> Tensor:
-#     """
-#     relu function max(x, 0)
-#     """
-#     if deriv:
-#         return 1 if x > 0 else 0
-#     return x if x > 0 else 0
+def relu(x: Tensor) -> Tensor:
+    """
+    relu function max(x, 0)
+    """
+    if not isinstance(x, Tensor):
+        return x if x > 0 else 0
+    return x.max(0) # pas très joli mais bon...
 
 def tanh(x: Tensor) -> Tensor:
     """

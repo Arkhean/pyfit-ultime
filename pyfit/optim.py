@@ -4,8 +4,8 @@ Optimization algorithms for gradient descent
 
 # pylint: disable=too-few-public-methods
 
-from pyfit.engine import Tensor
 from typing import List
+from pyfit.engine import Tensor
 
 
 class Optimizer:

@@ -4,13 +4,12 @@ data processing functions
 
 # pylint: disable=too-few-public-methods
 
-from typing import Any, List, Tuple
+from typing import Any, List, Tuple, NamedTuple, Iterator
 import random
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 from pyfit.engine import as_array
-from typing import NamedTuple, Iterator
 from pyfit.engine import Tensor
 
 
@@ -31,7 +30,10 @@ def train_test_split(*arrays: Any, **options: Any) -> List[Any]:
         res += [train_set, test_set]
     return res
 
-def make_classification(nb_samples: int, nb_class: int, nb_features: int) -> Tuple[np.ndarray, np.ndarray]:
+def make_classification(
+        nb_samples: int,
+        nb_class: int,
+        nb_features: int) -> Tuple[np.ndarray, np.ndarray]:
     """
     generate clusters of points normally distributed
     """
