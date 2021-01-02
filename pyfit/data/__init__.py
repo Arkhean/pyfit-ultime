@@ -72,25 +72,33 @@ def plot_data(x: np.ndarray, y: np.ndarray) -> None:
     plt.ylim((min(x[:, 1]) - 0.1, max(x[:, 1]) + 0.1))
 
 
-Batch = NamedTuple("Batch", [("inputs", Tensor), ("targets", Tensor)])
 
 ################################################################################
-# does not work with Tensor TODO
+
+Batch = NamedTuple("Batch", [("inputs", List[Tensor]), ("targets", List[Tensor])])
 
 class BatchIterator:
-    """Batch iterator"""
+    """Iterates on data by batches"""
 
-    def __init__(self, batch_size: int = 32, shuffle: bool = True) -> None:
+    def __init__(
+        self,
+        inputs: List[Tensor],
+        targets: List[Tensor],
+        batch_size: int = 32,
+        shuffle: bool = True,
+    ) -> None:
+        self.inputs: List[Tensor] = inputs
+        self.targets: List[Tensor] = targets
         self.batch_size = batch_size
         self.shuffle = shuffle
 
-    def __call__(self, inputs: Tensor, targets: Tensor) -> Iterator[Batch]:
-        starts = list(range(0, len(inputs), self.batch_size))
+    def __call__(self) -> Iterator[Batch]:
+        starts = list(range(0, len(self.inputs), self.batch_size))
         if self.shuffle:
             random.shuffle(starts)
 
         for start in starts:
             end = start + self.batch_size
-            batch_inputs = Tensor(inputs[start:end])
-            batch_targets = Tensor(targets[start:end])
+            batch_inputs = self.inputs[start:end]
+            batch_targets = self.targets[start:end]
             yield Batch(batch_inputs, batch_targets)

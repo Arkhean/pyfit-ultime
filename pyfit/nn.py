@@ -131,7 +131,7 @@ class Activation(Layer):
 
 ################################################################################
 
-class Model(Module):
+class Sequential(Module):
     """A Multi-Layer Perceptron, aka shallow neural network"""
 
     def __init__(self) -> None:

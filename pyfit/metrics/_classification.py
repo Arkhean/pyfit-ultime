@@ -7,7 +7,9 @@ module containing metrics for model evaluation
 # FP: pred = True, true= False
 # FN: pred = False, true = True
 # TN: pred= False, true = False
+from typing import List
 import numpy as np
+from pyfit.engine import Tensor
 
 def accuracy_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     """
@@ -57,3 +59,17 @@ def recall_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     if true_pos == 0:
         return 0
     return true_pos / (true_pos + false_neg)
+
+################################################################################
+
+def binary_accuracy(y_true: List[Tensor], y_pred: List[Tensor]) -> float:
+    """Binary accuracy"""
+
+    n_exact: int = sum(
+        [
+            y_true_i.data == round(y_pred_i.data)
+            for (y_true_i, y_pred_i) in zip(y_true, y_pred)
+        ]
+    )
+    n_total: int = max(len(y_true), 1)
+    return n_exact / n_total

@@ -74,6 +74,7 @@ class Tensor:
         return out
 
     def max(self, other: Union["Tensor", np.ndarray, float]) -> "Tensor":
+        """compute max"""
         raise NotImplementedError
     #     out = Tensor(, (self,), "ReLU")
     #     def _backward() -> None:

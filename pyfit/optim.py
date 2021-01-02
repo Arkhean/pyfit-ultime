@@ -20,6 +20,11 @@ class Optimizer:
         for p in self.parameters:
             p.zero_grad()
 
+    def step(self) -> None:
+        """Take a step of gradient descent"""
+
+        raise NotImplementedError
+
 
 class SGD(Optimizer):
     """Stochastic Gradient Descent optimizer"""
