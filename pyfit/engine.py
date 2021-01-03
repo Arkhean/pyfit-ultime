@@ -10,7 +10,7 @@ import numpy as np
 
 def as_tensor(x: Any) -> "Tensor":
     """
-    convert list to ndarray if necessary
+    convert list to Tensor if necessary
     """
     if not isinstance(x, Tensor):
         return Tensor(x)
@@ -28,7 +28,11 @@ def as_array(x: Any) -> np.ndarray:
 
 
 class Tensor:
-    """Stores values and their gradients"""
+    """
+    Stores values and their gradients
+    shape must be (batch_size, nb_features)
+    input with shape () and (n,) will be convert to (1, n)
+    """
 
     def __init__(
         self, data: np.ndarray, children: Tuple["Tensor", ...] = (), op: str = ""
@@ -49,6 +53,7 @@ class Tensor:
         self.grad = np.zeros(self.data.shape)
 
     def __len__(self) -> int:
+        """number of sample in tensor"""
         return len(self.data)
 
     def __getitem__(self, i: Any) -> "Tensor":
@@ -58,10 +63,10 @@ class Tensor:
         return new_tensor
 
     def mean(self) -> "Tensor":
-        """compute mean of tensor"""
-        out = Tensor(np.mean(self.data), (self,), "mean")
+        """compute mean of tensor for each sample (axis=1)"""
+        out = Tensor(np.mean(self.data, axis=1), (self,), "mean")
         def _backward() -> None:
-            self.grad += out.grad / self.data.size # pas sûr TODO
+            self.grad += out.grad / self.data.shape[1]
         out._backward = _backward
         return out
 
@@ -88,6 +93,11 @@ class Tensor:
             def _backward() -> None:
                 self.grad += out.grad  # d(out)/d(self) = 1
                 _other.grad += out.grad  # d(out)/d(other) = 1
+        elif self.data.shape[0] > 1 and _other.data.shape[0] == 1:
+            out = Tensor(self.data + _other.data, (self, _other), "+")
+            def _backward() -> None:
+                self.grad += out.grad  # d(out)/d(self) = 1
+                _other.grad += np.sum(out.grad, axis=0)  # d(out)/d(other) = 1
         elif _other.data.shape == (1, 1):
             # addition avec un scalaire
             out = Tensor(self.data + _other.data, (self, _other), "+")

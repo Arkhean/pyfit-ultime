@@ -67,7 +67,7 @@ def binary_accuracy(y_true: List[Tensor], y_pred: List[Tensor]) -> float:
 
     n_exact: int = sum(
         [
-            y_true_i.data == round(y_pred_i.data)
+            np.array_equal(y_true_i.data, np.round(y_pred_i.data))
             for (y_true_i, y_pred_i) in zip(y_true, y_pred)
         ]
     )

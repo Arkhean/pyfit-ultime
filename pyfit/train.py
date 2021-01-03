@@ -45,15 +45,14 @@ class Trainer:
             for batch in data_iterator():
                 # Forward pass
                 # TODO fix mypy error when mapping model to inputs
-                outputs = list(map(self.model, batch.inputs))  # type: ignore
+                outputs = self.model(batch.inputs)  # type: ignore
 
                 # Loss computation
-                batch_y_pred = [item for sublist in outputs for item in sublist]
-                batch_loss = self.loss(batch.targets, batch_y_pred)
-                epoch_loss += batch_loss.data
+                batch_loss = self.loss(batch.targets, outputs)
+                epoch_loss += batch_loss.data[0, 0]
 
                 # Store batch predictions and ground truth for computing epoch metrics
-                epoch_y_pred.extend(batch_y_pred)
+                epoch_y_pred.extend(outputs)
                 epoch_y_true.extend(batch.targets)
 
                 # Backprop and gradient descent
@@ -67,7 +66,7 @@ class Trainer:
             history["loss"].append(epoch_loss)
             history["acc"].append(epoch_acc)
 
-            if verbose:
+            if verbose and epoch % 10 == 0:
                 print(
                     f"Epoch [{epoch+1}/{num_epochs}], "
                     f"loss: {epoch_loss:.6f}, "

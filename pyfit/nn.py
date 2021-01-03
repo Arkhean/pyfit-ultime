@@ -6,7 +6,7 @@ Heavily inspired by https://github.com/karpathy/micrograd/blob/master/micrograd/
 
 from typing import List
 import numpy as np
-from pyfit.engine import Tensor
+from pyfit.engine import Tensor, as_tensor
 from pyfit.activation import ACTIVATION_FUNCTIONS
 
 
@@ -36,6 +36,7 @@ class Neuron(Module):
         self.activation = ACTIVATION_FUNCTIONS[activation]
 
     def __call__(self, x: Tensor) -> Tensor:
+        x = as_tensor(x)
         act: Tensor = x.dot(self.w) + self.b
         if self.nonlin and self.activation is not None:
             return self.activation(act)
@@ -78,6 +79,7 @@ class Dense(Layer):
         self.b = Tensor(2 * np.random.random_sample((out_features)) - 1)
 
     def __call__(self, x: Tensor) -> Tensor:
+        x = as_tensor(x)
         act: Tensor = x.dot(self.w) + self.b
         if self.nonlin and self.activation is not None:
             return self.activation(act)
@@ -100,6 +102,7 @@ class Dropout(Layer):
         self._mask = None
 
     def __call__(self, x: Tensor) -> Tensor:
+        x = as_tensor(x)
         self._mask = np.random.uniform(size=x.shape) > self.rate
         y = x * self._mask
         return y
@@ -119,6 +122,7 @@ class Activation(Layer):
         Layer.__init__(self, in_features, in_features, activation)
 
     def __call__(self, x: Tensor) -> Tensor:
+        x = as_tensor(x)
         if self.nonlin and self.activation is not None:
             return self.activation(x)
         return x
@@ -143,6 +147,7 @@ class Sequential(Module):
             self.layers.append(layer)
 
     def __call__(self, x: Tensor) -> Tensor:
+        x = as_tensor(x)
         for layer in self.layers:
             x = layer(x)
         return x
