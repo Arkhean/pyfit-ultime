@@ -22,7 +22,7 @@ def relu(x: Tensor) -> Tensor:
     """
     if not isinstance(x, Tensor):
         return x if x > 0 else 0
-    return x.max(0) # pas très joli mais bon...
+    return x.relu()
 
 def tanh(x: Tensor) -> Tensor:
     """
@@ -33,4 +33,9 @@ def tanh(x: Tensor) -> Tensor:
     return 2 * sigmoid(2 * x) - 1
 
 
-ACTIVATION_FUNCTIONS = {'sigmoid': sigmoid, 'tanh': tanh, 'linear': None}
+ACTIVATION_FUNCTIONS = {
+    'sigmoid': sigmoid,
+    'tanh': tanh,
+    'relu': relu,
+    'linear': None
+}

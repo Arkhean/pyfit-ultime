@@ -106,8 +106,6 @@ def test_tensor_dot() -> None:
     a = Tensor([[1, 2], [3, 4]])
     y = x.dot(a)
     assert np.array_equal(y.data, [[4, 6]])
-    y.backward()
-
 
 ################################################################################
 
@@ -119,4 +117,15 @@ def test_tensor_pow_scalar() -> None:
 ################################################################################
 
 def test_tensor_getitem() -> None:
-    pass
+    x = Tensor([1, 0, 3, 2, -1, 5, -2])
+    y = x[0, 2] # les tensors sont 2D pour des raisons pratiques...
+    assert np.array_equal(y.data, [[3]])
+    y = x[0, 3:5]
+    assert np.array_equal(y.data, [[2, -1]])
+
+################################################################################
+
+def test_tensor_relu() -> None:
+    x = Tensor([1, 0, 3, 2, -1, 5, -2])
+    y = x.relu()
+    assert np.array_equal(y.data, [[1, 0, 3, 2, 0, 5, 0]])

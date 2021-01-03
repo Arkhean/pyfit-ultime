@@ -1,13 +1,22 @@
 from pyfit.kmeans import KMeans
+from sklearn.cluster import KMeans as sk_KMeans
+from sklearn.datasets import make_blobs
+from sklearn.metrics import accuracy_score
 import numpy as np
 
 
-def test_fit():
-    # plantera si l'algorithme n'a pas convergé
-    X = np.array([[1, 2], [1, 4], [1, 0], [5, 2], [5, 4], [5, 0]])
-    kmeans = KMeans(n_clusters=2).fit(X)
-    assert np.array_equal(kmeans.labels_, np.array([1, 1, 1, 0, 0, 0])) or np.array_equal(kmeans.labels_, np.array([0, 0, 0, 1, 1, 1]))
-    assert np.array_equal(kmeans.centers_, np.array([[5.,  2.], [ 1.,  2.]])) or np.array_equal(kmeans.centers_, np.array([[1.,  2.], [5.,  2.]]))
+def test_kmeans():
+    X, y_true = make_blobs(n_samples=300, centers=4, cluster_std=0.60, random_state=0)
+    my_kmeans = KMeans(n_clusters = 4).fit(X)
+    sk_kmeans = sk_KMeans(n_clusters = 4).fit(X)
+    count = dict()
+    for y1, y2 in zip(my_kmeans.labels_, sk_kmeans.labels_):
+        count[(y1,y2)] = count.get((y1,y2), 0) + 1
+    count = list(count.values())
+    count = sorted(count, reverse=True)
+    assert sum(count[:4])/300 > 0.85
+
+
 
 def test_predict():
     # plantera si l'algorithme n'a pas convergé

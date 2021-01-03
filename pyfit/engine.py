@@ -73,14 +73,13 @@ class Tensor:
         out._backward = _backward
         return out
 
-    def max(self, other: Union["Tensor", np.ndarray, float]) -> "Tensor":
-        """compute max"""
-        raise NotImplementedError
-    #     out = Tensor(, (self,), "ReLU")
-    #     def _backward() -> None:
-    #         self.grad += out.grad *
-    #     out._backward = _backward
-    #     return out
+    def relu(self) -> "Tensor":
+        """Compute ReLU"""
+        out = Tensor(self.data * (self.data > 0), (self,), "ReLU")
+        def _backward() -> None:
+            self.grad += (out.data > 0) * out.grad
+        out._backward = _backward
+        return out
 
     def __add__(self, other: Union["Tensor", np.ndarray, float]) -> "Tensor":
         _other: Tensor = other if isinstance(other, Tensor) else Tensor(other)
