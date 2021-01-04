@@ -44,8 +44,7 @@ class Trainer:
 
             for batch in data_iterator():
                 # Forward pass
-                # TODO fix mypy error when mapping model to inputs
-                outputs = self.model(batch.inputs)  # type: ignore
+                outputs = self.model(batch.inputs)
 
                 # Loss computation
                 batch_loss = self.loss(batch.targets, outputs)

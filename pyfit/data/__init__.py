@@ -15,7 +15,7 @@ from pyfit.engine import Tensor
 
 def train_test_split(*arrays: Any, **options: Any) -> List[Any]:
     """
-    split data between train and test set with ratio
+    split data between train and test set with ratio: test_size=0.2
     """
     if len(arrays) == 0:
         raise ValueError("At least one array required as input")
