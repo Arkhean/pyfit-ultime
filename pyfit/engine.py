@@ -63,10 +63,11 @@ class Tensor:
         return new_tensor
 
     def mean(self) -> "Tensor":
-        """compute mean of tensor for each sample (axis=1)"""
-        out = Tensor(np.mean(self.data, axis=1), (self,), "mean")
+        """compute mean of tensor for each feature (axis=0)"""
+        out = Tensor(np.mean(self.data, axis=0), (self,), "mean")
+        #print(f"mean {self.shape}")
         def _backward() -> None:
-            self.grad += out.grad / self.data.shape[1]
+            self.grad += out.grad / ( [self.data.shape[0]] * self.data.shape[1] )
         out._backward = _backward
         return out
 
@@ -88,6 +89,7 @@ class Tensor:
 
     def __add__(self, other: Union["Tensor", np.ndarray, float]) -> "Tensor":
         _other: Tensor = other if isinstance(other, Tensor) else Tensor(other)
+        #print(f"add {self.shape} {_other.shape}")
         if self.data.shape == _other.data.shape:
             out = Tensor(self.data + _other.data, (self, _other), "+")
             def _backward() -> None:
@@ -97,12 +99,8 @@ class Tensor:
             out = Tensor(self.data + _other.data, (self, _other), "+")
             def _backward() -> None:
                 self.grad += out.grad  # d(out)/d(self) = 1
-                _other.grad += np.sum(out.grad, axis=0)  # d(out)/d(other) = 1
-        elif _other.data.shape == (1, 1):
-            # addition avec un scalaire
-            out = Tensor(self.data + _other.data, (self, _other), "+")
-            def _backward() -> None:
-                self.grad += out.grad
+                axis = tuple(x for x in range(len(_other.shape)) if _other.shape[x] == 1)
+                _other.grad += np.sum(out.grad, axis=axis)
         else:
             raise Exception(f'bad shapes: {self.data.shape} and {_other.data.shape}')
         out._backward = _backward
@@ -110,28 +108,12 @@ class Tensor:
 
     def __sub__(self, other: Union["Tensor", np.ndarray, float]) -> "Tensor":
         _other: Tensor = other if isinstance(other, Tensor) else Tensor(other)
-        if self.data.shape == _other.data.shape:
-            out: Tensor = Tensor(self.data - _other.data, (self, _other), "-")
-            def _backward() -> None:
-                self.grad += out.grad  # d(out)/d(self) = 1
-                _other.grad -= out.grad  # d(out)/d(other) = -1
-        elif _other.data.shape == (1, 1):
-            # soustraction avec un scalaire
-            out = Tensor(self.data - _other.data, (self, _other), "-")
-            def _backward() -> None:
-                self.grad += out.grad
-        elif self.data.shape == (1, 1):
-            # soustraction avec un scalaire
-            out = Tensor(self.data - _other.data, (self, _other), "-")
-            def _backward() -> None:
-                _other.grad -= out.grad
-        else:
-            raise Exception(f'bad shapes: {self.data.shape} and {_other.data.shape}')
-        out._backward = _backward
-        return out
+        #print(f"sub {self.shape} {_other.shape}")
+        return self + (-_other)
 
     def __neg__(self) -> "Tensor":
         out: Tensor = Tensor(-self.data, (self,), "neg")
+        #print(f"neg {self.shape}")
         def _backward() -> None:
             self.grad -= out.grad
         out._backward = _backward
@@ -139,6 +121,7 @@ class Tensor:
 
     def __mul__(self, other: Union["Tensor", np.ndarray, float]) -> "Tensor":
         _other = other if isinstance(other, Tensor) else Tensor(other)
+        #print(f"mul: {self.shape} {_other.shape}")
         if self.data.shape == _other.data.shape:
             # il faut les mêmes dimensions!
             out = Tensor(self.data * _other.data, (self, _other), "*")
@@ -157,6 +140,7 @@ class Tensor:
 
     def __truediv__(self, other: Union["Tensor", np.ndarray, float]) -> "Tensor":
         _other = other if isinstance(other, Tensor) else Tensor(other)
+        #print(f"div {self.shape}")
         if self.data.shape == _other.data.shape:
             # il faut les mêmes dimensions!
             out = Tensor(self.data / _other.data, (self, _other), "/")
@@ -180,6 +164,7 @@ class Tensor:
         return out
 
     def __pow__(self, other: int) -> "Tensor":
+        #print(f"pow {self.shape}")
         if isinstance(other, int):
             out = Tensor(self.data ** other, (self,), "**")
             def _backward() -> None:
@@ -192,6 +177,7 @@ class Tensor:
     def dot(self, other: Union["Tensor", np.ndarray]) -> "Tensor":
         """compute dot product between tensors"""
         _other = other if isinstance(other, Tensor) else Tensor(other)
+        #print(f"dot {self.shape} {_other.shape}")
         if self.data.shape[-1] == _other.data.shape[0]:
             out = Tensor(self.data.dot(_other.data), (self, _other), "dot")
             def _backward() -> None:
@@ -205,6 +191,7 @@ class Tensor:
     def exp(self) -> "Tensor":
         """Compute exp"""
         out = Tensor(np.exp(self.data), (self,), "exp")
+        #print(f"exp {self.shape}")
         def _backward() -> None:
             self.grad += out.grad * out.data
         out._backward = _backward
@@ -213,6 +200,7 @@ class Tensor:
     def log(self) -> "Tensor":
         """compute log"""
         out = Tensor(np.log(self.data), (self,), "exp")
+        #print(f"log {self.shape}")
         def _backward() -> None:
             self.grad += out.grad / self.data
         out._backward = _backward
