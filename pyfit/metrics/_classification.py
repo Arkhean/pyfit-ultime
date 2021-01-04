@@ -63,7 +63,7 @@ def recall_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
 ################################################################################
 
 def binary_accuracy(y_true: List[Tensor], y_pred: List[Tensor]) -> float:
-    """Binary accuracy"""
+    """Binary accuracy, used by Trainer"""
 
     n_exact: int = sum(
         [

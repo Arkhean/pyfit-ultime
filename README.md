@@ -2,7 +2,7 @@
 
 # Machine Learning functions and classes
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<!----------------------------------------------------------------------------->
 
 ## Data processing
 
@@ -52,7 +52,7 @@ for batch in dataset:
     y = batch.targets
 ```
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<!----------------------------------------------------------------------------->
 
 ## Loss Functions
 
@@ -68,21 +68,32 @@ Compute MAE between y_true ant y_pred.
 
 Compute LogLoss between y_true ant y_pred.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<!----------------------------------------------------------------------------->
 
 ## Metrics
 
 ### pyfit.metrics.euclidean_distance
 
+Euclidean distance: https://en.wikipedia.org/wiki/Euclidean_distance.
+
 ### pyfit.metrics.accuracy_score
+
+Compute accuracy classification between y_true and y_pred.
+Accuracy is defined as #TruePositive / #All.
 
 ### pyfit.metrics.recall_score
 
+Compute recall between y_true and y_pred.
+Recall is defined as #TruePositive / (#TruePositive + #FalsePositive)
+
 ### pyfit.metrics.precision_score
+
+Compute precision between y_true and y_pred.
+Precision is defined as #TruePositive / (#TruePositive + #FalseNegative)
 
 ### pyfit.metrics.binary_accuracy
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<!----------------------------------------------------------------------------->
 
 ## Machine Learning Models
 
@@ -98,20 +109,50 @@ Compute LogLoss between y_true ant y_pred.
 
 ### pyfit.decision_tree_classifier.DecisionTreeClassifier
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
 
 # Deep Learning functions and classes
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<!----------------------------------------------------------------------------->
 
 ## Engine - Autograd
 
 ### pyfit.engine.Tensor
 
+Stores values and their gradients. Shape must be (batch_size, nb_features).
+Input with shape () and (n,) will be convert to (1, n). A tensor is always 2D array!
+
+Supported operations:
+
+```python
+x.zero_grad()
+z = x.mean()    # input_shape: (m,n) --> output_shape: (m,1)
+z = x.abs()
+z = x.relu()
+z = x.exp()
+z = x.log()
+z = x + y       # only when shapes can be broadcast according to numpy
+z = x + 1       # equivalent to z = 1 + x
+z = x - 1       # equivalent to z = -(1 - x)
+z = -x
+z = x * y       # only when shapes are identical
+z = x * 2       # allowed with scalar but no gradient for the scalar
+z = 2 * x       # allowed with scalar but no gradient for the scalar
+z = x / y       # only when shapes are identical
+z = x / 2       # allowed with scalar but no gradient for the scalar
+z = 1 / x       # allowed with scalar but no gradient for the scalar
+z = x ** 2      # only with integer exponent
+z = x.dot(y)
+```
+
+Calling z.backward() after operations will automatically compute all gradients for all tensor involved in the computation of z.
+
 ### pyfit.engine.as_tensor
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Convert scalar, list or np.ndarray to Tensor if necessary.
+
+<!----------------------------------------------------------------------------->
 
 ## Activation functions
 
@@ -121,7 +162,7 @@ Compute LogLoss between y_true ant y_pred.
 
 ### pyfit.activation.tanh
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<!----------------------------------------------------------------------------->
 
 ## Neural Networks
 

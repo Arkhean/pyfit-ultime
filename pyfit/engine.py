@@ -10,7 +10,7 @@ import numpy as np
 
 def as_tensor(x: Any) -> "Tensor":
     """
-    convert list to Tensor if necessary
+    convert scalar, list or np.ndarray to Tensor if necessary
     """
     if isinstance(x, Tensor):
         return x
