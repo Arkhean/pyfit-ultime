@@ -90,17 +90,15 @@ class Tensor:
     def __add__(self, other: Union["Tensor", np.ndarray, float]) -> "Tensor":
         _other: Tensor = other if isinstance(other, Tensor) else Tensor(other)
         #print(f"add {self.shape} {_other.shape}")
-        if self.data.shape == _other.data.shape:
+        a,b = self.shape
+        c,d = _other.shape
+        if (b == d and (a == 1 or c == 1 or a == c)) or (a,b == 1,1) or (c,d == 1,1):
             out = Tensor(self.data + _other.data, (self, _other), "+")
             def _backward() -> None:
-                self.grad += out.grad  # d(out)/d(self) = 1
-                _other.grad += out.grad  # d(out)/d(other) = 1
-        elif self.data.shape[0] > 1 and _other.data.shape[0] == 1:
-            out = Tensor(self.data + _other.data, (self, _other), "+")
-            def _backward() -> None:
-                self.grad += out.grad  # d(out)/d(self) = 1
+                axis = tuple(x for x in range(len(self.shape)) if self.shape[x] == 1)
+                self.grad += np.sum(out.grad, axis=axis, keepdims=True)
                 axis = tuple(x for x in range(len(_other.shape)) if _other.shape[x] == 1)
-                _other.grad += np.sum(out.grad, axis=axis)
+                _other.grad += np.sum(out.grad, axis=axis, keepdims=True)
         else:
             raise Exception(f'bad shapes: {self.data.shape} and {_other.data.shape}')
         out._backward = _backward

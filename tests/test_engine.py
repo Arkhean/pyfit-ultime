@@ -37,6 +37,15 @@ def test_tensor_add_scalar() -> None:
     z.backward()
     assert np.array_equal(x.grad, [[1, 1]])
 
+def test_tensor_add() -> None:
+    x = Tensor([1, 1, 2])
+    y = Tensor([[.5, .5, .5], [.3, .2, .2]])
+    z = x + y
+    assert np.array_equal(z.data, [[1.5, 1.5, 2.5], [1.3, 1.2, 2.2]])
+    z.backward()
+    assert np.array_equal(x.grad, [[2, 2, 2]])
+    assert np.array_equal(y.grad, [[1, 1, 1], [1, 1, 1]])
+
 ################################################################################
 
 def test_tensor_sub_tensor() -> None:
