@@ -12,9 +12,20 @@ def as_tensor(x: Any) -> "Tensor":
     """
     convert list to Tensor if necessary
     """
-    if not isinstance(x, Tensor):
+    if isinstance(x, Tensor):
+        return x
+    elif  isinstance(x, float):
         return Tensor(x)
-    return x
+    elif isinstance(x, List):
+        if isinstance(x[0], float): # assuming user know what he is doing...
+            return Tensor(x)
+        elif isinstance(x[0], List) and isinstance(x[0][0], float):
+            return Tensor(x)
+    elif isinstance(x, np.ndarray):
+        if len(x.shape) <= 2:
+            return Tensor(x)
+        raise ValueError("Only np.ndarray with dims == 2 are allowed")
+    raise TypeError("Only float, List[float], List[List[float]], np.ndarray with dims == 2 are allowed")
 
 def as_array(x: Any) -> np.ndarray:
     """

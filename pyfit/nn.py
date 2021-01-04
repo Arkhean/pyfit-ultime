@@ -89,7 +89,7 @@ class Dense(Layer):
         return [self.w, self.b]
 
     def __repr__(self) -> str:
-        return f"Layer of {self.activation} Neurons({len(self.w)})"
+        return f"Dense Layer: input_shape: (batch_size, {self.in_features}), output_shape: (batch_size, {self.out_features})"
 
 ################################################################################
 
@@ -159,4 +159,4 @@ class Sequential(Module):
         return res
 
     def __repr__(self) -> str:
-        return f"MLP of [{', '.join(str(layer) for layer in self.layers)}]"
+        return f"Sequential model of {len(self.layers)} layers" + "\n" + "\n".join(l.__repr__() for l in self.layers)
