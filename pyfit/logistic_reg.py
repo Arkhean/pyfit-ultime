@@ -29,6 +29,8 @@ class LogisticReg:
             nb_iter += 1
         # pb dans le calcul de grad_teta
         print(nb_iter)
+        # puisque la descente de gradient n'est pas superbe, on tente l'autograd?
+        
 
     def passage_x1(self, x_entree: np.ndarray) -> np.ndarray:
         x_1 = []
