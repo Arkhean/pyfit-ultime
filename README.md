@@ -1,10 +1,15 @@
 # pyfit-ultime
 
-# Machine Learning functions and classes
+This library is designed to reproduce machine learning and deep learning algorithms from scratch in order to understand their subtleties.
+
 
 <!----------------------------------------------------------------------------->
 
-## Data processing
+# 1. Machine Learning functions and classes
+
+<!----------------------------------------------------------------------------->
+
+## 1.1. Data processing
 
 ### pyfit.preprocessing.Scaler
 
@@ -54,7 +59,7 @@ for batch in dataset:
 
 <!----------------------------------------------------------------------------->
 
-## Loss Functions
+## 1.2. Loss Functions
 
 ### pyfit.loss.mean_squared_error
 
@@ -70,7 +75,7 @@ Compute LogLoss between y_true ant y_pred.
 
 <!----------------------------------------------------------------------------->
 
-## Metrics
+## 1.3. Metrics
 
 ### pyfit.metrics.euclidean_distance
 
@@ -95,28 +100,56 @@ Precision is defined as #TruePositive / (#TruePositive + #FalseNegative)
 
 <!----------------------------------------------------------------------------->
 
-## Machine Learning Models
+## 1.4. Machine Learning Models
 
 ### pyfit.linear_reg.LinearReg
 
+<!-- TODO-->
+
 ### pyfit.logistic_reg.LogisticReg
+
+<!-- TODO-->
 
 ### pyfit.kmeans.KMeans
 
+```python
+kmeans = KMeans(n_clusters=4)
+kmeans.fit(X)           # Compute k-means clustering
+print(kmeans.centers_)
+print(kmeans.labels_)
+Y = kmeans.predict(X)   # Predict the closest center each sample in X belongs to.
+```
+
 ### pyfit.neighbors.KNeighborsClassifier
+
+<!-- TODO-->
 
 ### pyfit.neighbors.KNeighborsRegressor
 
+<!-- TODO-->
+
 ### pyfit.decision_tree_classifier.DecisionTreeClassifier
 
+A decision tree classifier, parameters:
+- criterion: 'gini' only
+- max_depth: bound for the tree depth, None for unlimited
+
+```python
+clf = DecisionTreeClassifier(criterion='gini', max_depth=5)
+clf.fit(X, Y)
+y_pred = clf.predict(X)
+```
+
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
 
-# Deep Learning functions and classes
+# 2. Deep Learning functions and classes
 
 <!----------------------------------------------------------------------------->
 
-## Engine - Autograd
+## 2.1 Engine - Autograd
+
+Deep Learning is made through automatic differentiation. You must use Tensor for your dataset.
 
 ### pyfit.engine.Tensor
 
@@ -172,7 +205,7 @@ Compute tanh function on x using numpy.
 
 <!----------------------------------------------------------------------------->
 
-## Neural Networks
+## 2.2 Neural Networks
 
 For all layers, at least input_length is necessary in order to build a sequential model.
 
@@ -185,7 +218,7 @@ n = Neuron(in_features=3, activation='sigmoid')
 x = Tensor([1,1,1])
 y = n(x)
 print(y.shape)  # (1,1)
-parameters = n.parameters() # list of tensor [weights, bias]
+parameters = n.parameters() # list of tensors [weights, bias]
 ```
 
 ### pyfit.nn.Activation
@@ -204,7 +237,7 @@ fully_connected_layer = Dense(in_features=3, out_features=2, activation='linear'
 
 ### pyfit.nn.Dropout
 
-The Dropout layer deactivate some neurons during training with probability based on parameters rate. Input length is necessary.
+The Dropout layer deactivate some neurons during training with probability based on the rate parameter. Input length is necessary.
 ```python
 dropout_layer = Dropout(in_features=3, rate=0.4)
 ```

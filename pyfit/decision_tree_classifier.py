@@ -154,7 +154,7 @@ class DecisionTreeNode:
 class DecisionTreeClassifier:
     """ A decision tree classifier, parameters:
     - criterion: 'gini' only
-    - max_depth: bound for the tree depth
+    - max_depth: bound for the tree depth, None for unlimited
     """
     def __init__(self, criterion: str = 'gini', max_depth: int = None) -> None:
         """  """
