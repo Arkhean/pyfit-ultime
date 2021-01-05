@@ -156,26 +156,103 @@ Convert scalar, list or np.ndarray to Tensor if necessary.
 
 ## Activation functions
 
+All of this functions can be used with numpy.ndarray and Tensor.
+
 ### pyfit.activation.sigmoid
+
+Compute sigmoid function on x: 1 / (1+exp(-x)).
 
 ### pyfit.activation.relu
 
+Compute ReLU function on x: max(x, 0)
+
 ### pyfit.activation.tanh
+
+Compute tanh function on x using numpy.
 
 <!----------------------------------------------------------------------------->
 
 ## Neural Networks
 
+For all layers, at least input_length is necessary in order to build a sequential model.
+
 ### pyfit.nn.Neuron
+
+Compute a single Neuron. The calculation is the sum of its inputs plus a bias. Then the result is activated by an activation function.
+
+```python
+n = Neuron(in_features=3, activation='sigmoid')
+x = Tensor([1,1,1])
+y = n(x)
+print(y.shape)  # (1,1)
+parameters = n.parameters() # list of tensor [weights, bias]
+```
 
 ### pyfit.nn.Activation
 
+Apply an activation function to its inputs. Input length is necessary.
+```python
+act = Activation(in_features=3, activation='relu')
+```
+
 ### pyfit.nn.Dense
+
+Same as Neuron but with a layer of Neurons. Input length and output length are necessary.
+```python
+fully_connected_layer = Dense(in_features=3, out_features=2, activation='linear')
+```
 
 ### pyfit.nn.Dropout
 
+The Dropout layer deactivate some neurons during training with probability based on parameters rate. Input length is necessary.
+```python
+dropout_layer = Dropout(in_features=3, rate=0.4)
+```
+
 ### pyfit.nn.Sequential
 
-### pyfit.optim.Optimizer
+Stack several layers in one model.
+
+```python
+model = Sequential()
+model.add(Dense(2, 4, activation='relu'))
+model.add(Dense(4, 1, activation='sigmoid'))
+# forward pass
+y_pred = model(X)
+parameters = model.parameters() # list of all parameters of all layers (flatten).
+```
+
+### pyfit.optim.SGD
+
+Only optimizer implemented, Stochastic Gradient Descent updates model parameters in the opposite direction of their gradient.
+
+```python
+opt = SGD(model.parameters())
+y = model(x)
+z = some_loss_function(y)
+z.backward()
+opt.step()  # updates weights and bias in model using gradients
+```
 
 ### pyfit.trainer.Trainer
+
+```python
+trainer = Trainer(model, optimizer, loss)
+history = trainer.fit(dataset, num_epochs=200, verbose=True)
+```
+history will be a dict containing loss and binary_accuracy for each epoch.
+
+Here is the main training loop:
+
+```python
+model = ...
+opt = SGD(model.parameters(), learning_rate=1e-2)
+
+for epoch in range(n_epochs):
+    opt.zero_grad()
+    for batch in dataset:   # using BatchIterator
+        y_pred = model(batch.inputs)
+        loss = some_loss_function(batch.targets, y_pred)
+        loss.backward()
+        opt.step()
+```
