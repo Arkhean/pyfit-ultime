@@ -21,10 +21,10 @@ def test_relu():
     assert y.data[0][1] == y_result[1]
     assert y.data[0][2] == y_result[2]
 
-def test_tanh(): #hum hum
+def test_tanh():
     x = Tensor([1, 3, 4])
     x_result = [1, 3, 4]
-    y = sigmoid(x)
+    y = tanh(x)
     y_result = []
     for x_i in x_result:
         y_result.append(sinh(x_i) / cosh(x_i))

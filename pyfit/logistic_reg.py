@@ -3,6 +3,7 @@ logistic regression algorithm
 """
 import numpy as np
 from pyfit.activation import sigmoid
+from pyfit.engine import *
 
 class LogisticReg:
 # Descente de gradient:
@@ -10,26 +11,29 @@ class LogisticReg:
     def __init__(self,
                 x_train: np.ndarray,
                 y_train: np.ndarray,
-                learning_rate=0.01,
-                max_iter=100) -> None:
+                learning_rate = 0.01,
+                max_iter = 100) -> None:
         m = len(x_train[0])
         #add column
         x_train_1 = self.passage_x1(x_train)
+        x_train_t = np.transpose(x_train_1)
         x_train_t = np.transpose(x_train_1)
         self.theta = np.random.random((m+1, 1))
         nb_iter = 1
         inter = sigmoid(np.matmul(x_train_1, self.theta)) - y_train
         grad_theta = (2 / m) * np.matmul(x_train_t, inter)
-        # pb: grad_theta.shape != self.theta.shape
-        # et les valeurs sont gigantesques!
         while nb_iter < max_iter:
             inter = sigmoid(np.matmul(x_train_1, self.theta)) - y_train
             grad_theta = (2 / m) * np.matmul(x_train_t, inter)
             self.theta = self.theta - learning_rate * grad_theta
             nb_iter += 1
         # pb dans le calcul de grad_teta
-        print(nb_iter)
-        # puisque la descente de gradient n'est pas superbe, on tente l'autograd?
+
+
+        
+
+
+
         
 
     def passage_x1(self, x_entree: np.ndarray) -> np.ndarray:
