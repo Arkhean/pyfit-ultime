@@ -24,7 +24,7 @@ def relu(x: Tensor) -> Tensor:
         return x if x > 0 else 0
     return x.relu()
 
-def tanh(x: Tensor) -> Tensor:
+def tan_h(x: Tensor) -> Tensor:
     """
     tanh function sinh(x) / cosh(x)
     """
@@ -35,7 +35,7 @@ def tanh(x: Tensor) -> Tensor:
 
 ACTIVATION_FUNCTIONS = {
     'sigmoid': sigmoid,
-    'tanh': tanh,
+    'tan_h': tan_h,
     'relu': relu,
     'linear': None
 }
