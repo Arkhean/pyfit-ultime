@@ -159,7 +159,7 @@ Input with shape () and (n,) will be convert to (1, n). A tensor is always 2D ar
 Supported operations:
 
 ```python
-x.zero_grad()
+x.zero_grad()   # reset gradient to zero
 z = x.mean()    # input_shape: (m,n) --> output_shape: (m,1)
 z = x.abs()
 z = x.relu()
@@ -167,7 +167,8 @@ z = x.exp()
 z = x.log()
 z = x + y       # only when shapes can be broadcast according to numpy
 z = x + 1       # equivalent to z = 1 + x
-z = x - 1       # equivalent to z = -(1 - x)
+z = x - 1       # equivalent to z = x + (-1)
+z = 1 - x       # equivalent to z = 1 + (-x)
 z = -x
 z = x * y       # only when shapes are identical
 z = x * 2       # allowed with scalar but no gradient for the scalar
@@ -176,7 +177,7 @@ z = x / y       # only when shapes are identical
 z = x / 2       # allowed with scalar but no gradient for the scalar
 z = 1 / x       # allowed with scalar but no gradient for the scalar
 z = x ** 2      # only with integer exponent
-z = x.dot(y)
+z = x.dot(y)    # matrix product
 ```
 
 Calling z.backward() after operations will automatically compute all gradients for all tensor involved in the computation of z.
