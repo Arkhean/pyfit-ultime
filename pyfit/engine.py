@@ -79,7 +79,7 @@ class Tensor:
         out = Tensor(np.mean(self.data, axis=0), (self,), "mean")
         #print(f"mean {self.shape}")
         def _backward() -> None:
-            self.grad += out.grad / ( [self.data.shape[0]] * self.data.shape[1] )
+            self.grad += out.grad / ([self.data.shape[0]] * self.data.shape[1])
         out._backward = _backward
         return out
 
@@ -102,9 +102,9 @@ class Tensor:
     def __add__(self, other: Union["Tensor", np.ndarray, float]) -> "Tensor":
         _other: Tensor = other if isinstance(other, Tensor) else Tensor(other)
         #print(f"add {self.shape} {_other.shape}")
-        a,b = self.shape
-        c,d = _other.shape
-        if (b == d and (a == 1 or c == 1 or a == c)) or (a,b == 1,1) or (c,d == 1,1):
+        a, b = self.shape
+        c, d = _other.shape
+        if (b == d and (a == 1 or c == 1 or a == c)) or (a, b == 1, 1) or (c, d == 1, 1):
             out = Tensor(self.data + _other.data, (self, _other), "+")
             def _backward() -> None:
                 axis = tuple(x for x in range(len(self.shape)) if self.shape[x] == 1)
@@ -253,3 +253,17 @@ class Tensor:
 
     def __repr__(self) -> str:
         return f"Tensor(data={self.data}, grad={self.grad})"
+
+
+
+def passage_x1(x_entree: np.ndarray) -> np.ndarray:
+        """
+        add of a column of 1
+        """
+        x_1 = []
+        for ligne in x_entree:
+            ligne_bis = ligne
+            ligne_bis = np.append(ligne_bis, 1)
+            x_1.append(ligne_bis)
+        x_1 = np.array(x_1)
+        return x_1

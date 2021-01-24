@@ -39,3 +39,15 @@ ACTIVATION_FUNCTIONS = {
     'relu': relu,
     'linear': None
 }
+
+################################################################################
+
+def softmax(z):
+    z -= np.max(z)
+    sm = (np.exp(z).T / np.sum(np.exp(z),axis=1)).T
+    return sm
+
+def getProbsAndPreds(someX):
+    probs = softmax(np.dot(someX,w))
+    preds = np.argmax(probs,axis=1)
+    return probs,preds
