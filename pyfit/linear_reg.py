@@ -2,7 +2,8 @@
 linear regression algorithm
 """
 import numpy as np
-from engine import passage_x1
+from pyfit.engine import passage_x1
+
 
 class LinearReg:
     """
